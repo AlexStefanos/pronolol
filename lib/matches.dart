@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:pronolol/matches_list.dart';
+import 'package:pronolol/match_item.dart';
 import 'package:pronolol/models/match.dart';
 import 'package:pronolol/data/teams.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class Matches extends StatefulWidget {
+  const Matches({super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -12,9 +12,9 @@ class Home extends StatefulWidget {
   }
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Matches> {
   final List<Match> _matchesList = [
-    Match(teams[0], teams[1], ["BO3", "Worlds"], DateTime.now(), true)
+    Match(teams[0], teams[1], '2 - 0', ['BO3', 'Worlds'], DateTime.now(), true)
   ];
 
   @override
@@ -24,17 +24,24 @@ class _HomeState extends State<Home> {
 
     if (_matchesList.isNotEmpty) {
       mainContent = ListView.builder(
-          itemCount: _matchesList.length,
-          itemBuilder: (ctx, i) =>
-              Dismissible(key: ValueKey(_matchesList), child: _matchesList[i]));
+        itemCount: _matchesList.length,
+        itemBuilder: (ctx, i) => Dismissible(
+          key: ValueKey(_matchesList),
+          child: MatchItem(_matchesList[i]),
+        ),
+      );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("pronolol"),
+        title: const Text('pronolol'),
       ),
       body: Column(
-        children: [],
+        children: [
+          Expanded(
+            child: mainContent,
+          )
+        ],
       ),
     );
   }

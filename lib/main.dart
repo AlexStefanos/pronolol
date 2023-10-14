@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pronolol/home.dart';
+import 'package:pronolol/matches.dart';
 
 void main() {
-  runApp(const Home());
+  runApp(const MaterialApp(
+    home: Matches(),
+  ));
 }
