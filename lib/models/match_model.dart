@@ -1,4 +1,7 @@
-import 'package:pronolol/models/team.dart';
+import 'package:pronolol/models/team_model.dart';
+import 'package:intl/intl.dart';
+
+final formatter = DateFormat('dd/M/y');
 
 class Match {
   const Match(this.team1, this.team2, this.score, this.settings, this.date,
@@ -10,4 +13,8 @@ class Match {
   final String score;
   final DateTime date;
   final bool result;
+
+  String get formattedDate {
+    return formatter.format(date);
+  }
 }

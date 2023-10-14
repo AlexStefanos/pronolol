@@ -1,37 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:pronolol/match_item.dart';
-import 'package:pronolol/models/match.dart';
-import 'package:pronolol/data/teams.dart';
+import 'package:pronolol/data/matches_data.dart';
 
 class Matches extends StatefulWidget {
   const Matches({super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return _HomeState();
+    return _MatchPageState();
   }
 }
 
-class _HomeState extends State<Matches> {
-  final List<Match> _matchesList = [
-    Match(teams[0], teams[1], '2 - 0', ['BO3', 'Worlds'], DateTime.now(), true)
-  ];
-
+class _MatchPageState extends State<Matches> {
   @override
   Widget build(BuildContext context) {
-    Widget mainContent =
-        const Center(child: Text('Y a pu de matchs igo tu fous quoi ?'));
-
-    if (_matchesList.isNotEmpty) {
-      mainContent = ListView.builder(
-        itemCount: _matchesList.length,
-        itemBuilder: (ctx, i) => Dismissible(
-          key: ValueKey(_matchesList),
-          child: MatchItem(_matchesList[i]),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('pronolol'),
@@ -39,8 +21,11 @@ class _HomeState extends State<Matches> {
       body: Column(
         children: [
           Expanded(
-            child: mainContent,
-          )
+            child: ListView.builder(
+              itemCount: matches.length,
+              itemBuilder: (ctx, i) => MatchItem(matches[i]),
+            ),
+          ),
         ],
       ),
     );

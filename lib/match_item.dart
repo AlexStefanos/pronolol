@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pronolol/models/match.dart';
+import 'package:pronolol/models/match_model.dart';
+import 'package:pronolol/prono.dart';
 
 class MatchItem extends StatelessWidget {
   final Match match;
@@ -8,25 +9,23 @@ class MatchItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void _addPronoOverlay() {
+      showModalBottomSheet(context: context, builder: (ctx) => Prono());
+    }
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            IconButton(
+                onPressed: _addPronoOverlay, icon: const Icon(Icons.bento)),
             Text(
-              '${match.team1.name} vs ${match.team2.name}',
+              '${match.team1.name} ${match.team1.country.flag} vs ${match.team2.name} ${match.team2.country.flag}',
               style: Theme.of(context).textTheme.titleLarge,
             ),
-            const SizedBox(height: 2),
-            Row(
-              children: [
-                Text(
-                  match.score,
-                  style: const TextStyle(color: Colors.black),
-                ),
-              ],
-            ),
+            Text(match.score),
+            Text(match.formattedDate),
           ],
         ),
       ),
