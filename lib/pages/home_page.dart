@@ -27,7 +27,8 @@ class _HomePageState extends State<HomePage> {
                 ],
               ))),
       floatingActionButton: FloatingActionButton(
-          onPressed: () async => await LolEsportApi.getWebsiteData()),
+        onPressed: () async => await LolEsportApi.getWebsiteData(),
+      ),
     );
   }
 }

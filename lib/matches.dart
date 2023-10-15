@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pronolol/api/lolesport.dart';
 import 'package:pronolol/match_item.dart';
-import 'package:pronolol/data/matches_data.dart';
 
 class Matches extends StatefulWidget {
   const Matches({super.key});
@@ -22,8 +22,8 @@ class _MatchPageState extends State<Matches> {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: matches.length,
-              itemBuilder: (ctx, i) => MatchItem(matches[i]),
+              itemCount: LolEsportApi.previousMatches.length,
+              itemBuilder: (ctx, i) => MatchItem(i),
             ),
           ),
         ],

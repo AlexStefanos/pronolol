@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:html/dom.dart' as dom;
+import 'package:pronolol/data/teams_data.dart';
 
 class Team {
   final String name;
@@ -52,17 +53,14 @@ class LolEsportApi {
               currentRowNumber.toString()) {
         final names =
             games[i].getElementsByClassName('teamname').map((e) => e.text);
-        final logos = games[i]
-            .getElementsByTagName('img')
-            .map((e) => e.attributes['src'].toString());
 
-        if (names.length != 2 && logos.length != 2) {
+        if (names.length != 2) {
           continue;
         }
 
         final teams = [];
         for (int j = 0; j < 2; j++) {
-          teams.add(Team(names.elementAt(j), logos.elementAt(j)));
+          teams.add(Team(names.elementAt(j), teamsLogo[names.elementAt(j)]!));
         }
 
         final score = games[i]
