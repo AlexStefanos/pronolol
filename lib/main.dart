@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pronolol/api/firebase.dart';
 import 'package:pronolol/api/lolesport.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -10,7 +11,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  LolEsportApi.getWebsiteData();
+  await FirebaseApi().initNotifications();
+  await LolEsportApi.getWebsiteData();
   runApp(const PronololApp());
 }
 

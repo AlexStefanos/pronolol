@@ -12,21 +12,22 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text("Pronolol")),
-        floatingActionButton: FloatingActionButton(
-            onPressed: () async => await LolEsportApi.getWebsiteData()),
-        body: ListView.builder(
-            itemCount: LolEsportApi.previousMatches.length,
-            itemBuilder: (context, index) => Card(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Image.network(
-                        LolEsportApi.previousMatches[index].teamA.imageUrl),
-                    Text(LolEsportApi.previousMatches[index].toString()),
-                    Image.network(
-                        LolEsportApi.previousMatches[index].teamB.imageUrl),
-                  ],
-                ))));
+      appBar: AppBar(title: const Text("Pronolol")),
+      body: ListView.builder(
+          itemCount: LolEsportApi.previousMatches.length,
+          itemBuilder: (context, index) => Card(
+                  child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Image.network(
+                      LolEsportApi.previousMatches[index].teamA.imageUrl),
+                  Text(LolEsportApi.previousMatches[index].toString()),
+                  Image.network(
+                      LolEsportApi.previousMatches[index].teamB.imageUrl),
+                ],
+              ))),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () async => await LolEsportApi.getWebsiteData()),
+    );
   }
 }

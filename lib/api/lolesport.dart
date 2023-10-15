@@ -35,6 +35,8 @@ class LolEsportApi {
   static List<Match> futureMatches = [];
 
   static Future getWebsiteData() async {
+    LolEsportApi.previousMatches = [];
+    LolEsportApi.futureMatches = [];
     final url = Uri.parse(
         'https://lol.fandom.com/wiki/2023_Season_World_Championship/Play-In');
     final response = await http.get(url);
@@ -48,13 +50,19 @@ class LolEsportApi {
       if (games[i].attributes.containsKey('data-highlight-row') &&
           games[i].attributes['data-highlight-row'] ==
               currentRowNumber.toString()) {
-        final teams = games[i].getElementsByTagName('img').map((e) => Team(
-            e.attributes['alt']
-                .toString()
-                .substring(0, e.attributes['alt'].toString().length - 8),
-            e.attributes['src'].toString()));
-        if (teams.length != 2) {
+        final names =
+            games[i].getElementsByClassName('teamname').map((e) => e.text);
+        final logos = games[i]
+            .getElementsByTagName('img')
+            .map((e) => e.attributes['src'].toString());
+
+        if (names.length != 2 && logos.length != 2) {
           continue;
+        }
+
+        final teams = [];
+        for (int j = 0; j < 2; j++) {
+          teams.add(Team(names.elementAt(j), logos.elementAt(j)));
         }
 
         final score = games[i]
@@ -72,5 +80,8 @@ class LolEsportApi {
         }
       }
     }
+    LolEsportApi.previousMatches =
+        List.from(LolEsportApi.previousMatches.reversed);
+    LolEsportApi.futureMatches = List.from(LolEsportApi.futureMatches.reversed);
   }
 }
