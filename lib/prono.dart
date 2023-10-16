@@ -4,8 +4,9 @@ import 'package:pronolol/api/lolesport.dart';
 
 class Prono extends StatefulWidget {
   final int index;
+  final String user;
 
-  const Prono(this.index, {super.key});
+  const Prono(this.index, this.user, {super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -19,10 +20,17 @@ class _PronoState extends State<Prono> {
 
   @override
   Widget build(BuildContext context) {
-    void _sendProno() {
-      FirebaseFirestore.instance.collection('pronostics').doc('match_00').set({
-        'player1': [_dropDownValue1, _dropDownValue2]
-      });
+    void sendProno() {
+      if (widget.user != '-') {
+        FirebaseFirestore.instance.collection('pronostics').doc().set({
+          'name': widget.user,
+          'pronos': [_dropDownValue1, _dropDownValue2],
+          'teams': [
+            LolEsportApi.previousMatches[widget.index].team1.name,
+            LolEsportApi.previousMatches[widget.index].team2.name
+          ]
+        });
+      }
     }
 
     void dropDownCallback1(int? selectedValue) {
@@ -46,7 +54,7 @@ class _PronoState extends State<Prono> {
       child: Row(
         children: [
           Image.network(
-            LolEsportApi.previousMatches[widget.index].teamA.imageUrl,
+            LolEsportApi.previousMatches[widget.index].team1.imageUrl,
             height: 50,
             width: 50,
           ),
@@ -70,7 +78,7 @@ class _PronoState extends State<Prono> {
           ),
           const SizedBox(width: 50),
           Image.network(
-            LolEsportApi.previousMatches[widget.index].teamB.imageUrl,
+            LolEsportApi.previousMatches[widget.index].team2.imageUrl,
             height: 50,
             width: 50,
           ),
@@ -93,7 +101,9 @@ class _PronoState extends State<Prono> {
             onChanged: dropDownCallback2,
           ),
           IconButton(
-            onPressed: _sendProno,
+            onPressed: (_dropDownValue1 != _dropDownValue2)
+                ? sendProno
+                : () {/*TODO*/},
             icon: const Icon(Icons.send),
           ),
         ],

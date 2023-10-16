@@ -4,23 +4,17 @@ import 'package:pronolol/prono.dart';
 
 class MatchItem extends StatelessWidget {
   final int index;
+  final String user;
 
-  const MatchItem(this.index, {super.key});
+  const MatchItem(this.index, this.user, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    final Image imageTeamA = Image.network(
-      LolEsportApi.previousMatches[index].teamA.imageUrl,
-      height: 50,
-      width: 50,
-    );
-    final Image imageTeamB = Image.network(
-      LolEsportApi.previousMatches[index].teamB.imageUrl,
-      height: 50,
-      width: 50,
-    );
-    void _addPronoOverlay() {
-      showModalBottomSheet(context: context, builder: (ctx) => Prono(index));
+    void addPronoOverlay() {
+      showModalBottomSheet(
+        context: context,
+        builder: (ctx) => Prono(index, user),
+      );
     }
 
     return Card(
@@ -29,12 +23,20 @@ class MatchItem extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            imageTeamA,
+            Image.network(
+              LolEsportApi.previousMatches[index].team1.imageUrl,
+              height: 50,
+              width: 50,
+            ),
             Text(LolEsportApi.previousMatches[index].toString()),
-            imageTeamB,
+            Image.network(
+              LolEsportApi.previousMatches[index].team2.imageUrl,
+              height: 50,
+              width: 50,
+            ),
             const SizedBox(width: 15),
             IconButton(
-              onPressed: _addPronoOverlay,
+              onPressed: addPronoOverlay,
               icon: const Icon(Icons.bento),
             ),
           ],

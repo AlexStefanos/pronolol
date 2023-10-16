@@ -12,7 +12,7 @@ class Team extends StatefulWidget {
 class _TeamsState extends State<Team> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    // TODO: pouvoir voir l'historique d'une équipe en cliquant sur l'icone
     throw UnimplementedError();
   }
 }
