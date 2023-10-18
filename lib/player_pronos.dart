@@ -22,16 +22,17 @@ class _PlayerPronoState extends State<PlayerProno> {
     void getClientStream() async {
       var collectionRef = FirebaseFirestore.instance.collection('pronostics');
       QuerySnapshot querySnapshot = await collectionRef.get();
-      final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+      // final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
       collectionRef.get().then((QuerySnapshot qS) {
-        qS.docs.forEach((doc) {
+        for (var doc in qS.docs) {
+          int i = 0;
           if (doc['name'] == widget.user) {
             setState(() {
-              pronos[doc['name']] = doc['pronos'];
-              teams[doc['name']] = doc['teams'];
+              pronos[doc['name'] + i.toString()] = doc['pronos'];
+              teams[doc['name'] + i.toString()] = doc['teams'];
             });
           }
-        });
+        }
       });
     }
 
@@ -45,8 +46,8 @@ class _PlayerPronoState extends State<PlayerProno> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: pronos.length,
-              itemBuilder: (ctx, i) => PlayerPronoItem(pronos, teams),
+              itemCount: pronos.length + teams.length,
+              itemBuilder: (ctx, i) => PlayerPronoItem(pronos, teams, i),
             ),
           ),
         ],

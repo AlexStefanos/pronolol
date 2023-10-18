@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pronolol/api/lolesport.dart';
+import 'package:pronolol/leaderboard.dart';
 import 'package:pronolol/match_item.dart';
 import 'package:pronolol/player_pronos.dart';
 
@@ -26,12 +27,20 @@ class _MatchPageState extends State<Matches> {
     showModalBottomSheet(context: context, builder: (ctx) => PlayerProno(user));
   }
 
+  void seeLeaderboard() {
+    showModalBottomSheet(context: context, builder: (ctx) => Leaderboard());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('pronolol'),
         actions: [
+          ElevatedButton(
+            onPressed: seeLeaderboard,
+            child: const Text('Classement'),
+          ),
           ElevatedButton(
             onPressed: seePlayerPronos,
             child: const Text('Mes pronos'),
