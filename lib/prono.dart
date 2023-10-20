@@ -20,15 +20,46 @@ class _PronoState extends State<Prono> {
 
   @override
   Widget build(BuildContext context) {
-    void sendProno() {
-      if (widget.user != '-') {
-        FirebaseFirestore.instance.collection('pronostics').doc().set({
-          'name': widget.user,
-          'pronos': [_dropDownValue1, _dropDownValue2],
+    Future<bool> matchExistence() async {
+      bool result = false;
+      var collectionRef = FirebaseFirestore.instance.collection('pronostics');
+      collectionRef.get().then((QuerySnapshot qS) {
+        for (var doc in qS.docs) {
+          if (doc['teams'] ==
+              [
+                LolEsportApi.previousMatches[widget.index].team1.name,
+                LolEsportApi.previousMatches[widget.index].team2.name
+              ]) {
+            result = true;
+          }
+        }
+      });
+      return result;
+    }
+
+    void sendProno() async {
+      var collectionRef = FirebaseFirestore.instance.collection('pronostics');
+      if ((widget.user != '-') && (await matchExistence() == false)) {
+        collectionRef.doc().set({
           'teams': [
             LolEsportApi.previousMatches[widget.index].team1.name,
             LolEsportApi.previousMatches[widget.index].team2.name
-          ]
+          ],
+          'pronos${widget.user}': [_dropDownValue1, _dropDownValue2]
+        });
+      } else {
+        collectionRef.get().then((QuerySnapshot qS) {
+          for (var doc in qS.docs) {
+            if (doc['teams'] ==
+                [
+                  LolEsportApi.previousMatches[widget.index].team1.name,
+                  LolEsportApi.previousMatches[widget.index].team2.name
+                ]) {
+              collectionRef.doc(doc.id).set({
+                'pronos${widget.user}': [_dropDownValue1, _dropDownValue2]
+              });
+            }
+          }
         });
       }
     }
