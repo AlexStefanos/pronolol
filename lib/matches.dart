@@ -38,10 +38,6 @@ class _MatchPageState extends State<Matches> {
         title: const Text('pronolol'),
         actions: [
           ElevatedButton(
-            onPressed: seeLeaderboard,
-            child: const Text('Classement'),
-          ),
-          ElevatedButton(
             onPressed: seePlayerPronos,
             child: const Text('Mes pronos'),
           ),
@@ -91,6 +87,8 @@ class _MatchPageState extends State<Matches> {
           ),
         ],
       ),
+      floatingActionButton:
+          FloatingActionButton(onPressed: () => seeLeaderboard()),
     );
   }
 }

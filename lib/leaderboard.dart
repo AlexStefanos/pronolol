@@ -23,9 +23,7 @@ class _LeaderboardState extends State<Leaderboard> {
                   padding: EdgeInsets.symmetric(horizontal: 22, vertical: 18),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(''),
-                    ],
+                    children: [],
                   ),
                 ),
               ),
