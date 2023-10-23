@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pronolol/api/lolesport.dart';
@@ -20,55 +22,35 @@ class _PronoState extends State<Prono> {
 
   @override
   Widget build(BuildContext context) {
-    void sendProno() {
-      /*TODO : j'aimerai parcourir les documents de pronostics pour savoir si un document dans la bdd a déjà été créé pour un match ou non.
-                    Exemple : Avant de créer un document pour le match PSG-BDS par exemple, on parcourt la bdd pour savoir si il y a un doc qui lui est attribué
-              Puis, ce sera aussi pratique pour savoir si quelqu'un a déjà fait ses pronos ou non.*/
-      bool result = false;
+    void sendProno() async {
+      if (widget.user == '-') {
+        return;
+      }
+
       var collectionRef = FirebaseFirestore.instance.collection('pronostics');
-      // try {
-      //   collectionRef.get().then((QuerySnapshot qS) async {
-      //     for (var doc in qS.docs) {
-      //       DocumentSnapshot snapshot = await FirebaseFirestore.instance
-      //           .collection('pronostics')
-      //           .doc(doc.id)
-      //           .get();
-      //       print('before if');
-      //       if ('${LolEsportApi.previousMatches[widget.index].team1.name}-${LolEsportApi.previousMatches[widget.index].team2.name}' ==
-      //           snapshot.data['designation']) {
-      //         result = true;
-      //         print('entered if');
-      //       }
-      //     }
-      //   });
-      // } catch (e) {
-      //   rethrow;
-      // }
-      if (result == false) {
-        if ((widget.user != '-')) {
-          collectionRef.doc().set(
+      try {
+        var bettingMatchDoc = await collectionRef
+            .where("designation",
+                isEqualTo:
+                    LolEsportApi.previousMatches[widget.index].designation())
+            .get();
+        if (bettingMatchDoc.size > 0) {
+          await bettingMatchDoc.docs.first.reference.update(
             {
-              'designation':
-                  '${LolEsportApi.previousMatches[widget.index].team1.name}-${LolEsportApi.previousMatches[widget.index].team2.name}',
-              'result':
-                  '${LolEsportApi.previousMatches[widget.index].scoreA}-${LolEsportApi.previousMatches[widget.index].scoreB}',
-              'bets': {widget.user: '$_dropDownValue1$_dropDownValue2'}
+              'bets': {...bettingMatchDoc.docs.first.data()['bets'], widget.user: '$_dropDownValue1$_dropDownValue2'}
             },
           );
         } else {
-          collectionRef.get().then((QuerySnapshot qS) {
-            for (var doc in qS.docs) {
-              if (doc['designation'].toString() ==
-                  '${LolEsportApi.previousMatches[widget.index].team1.name}-${LolEsportApi.previousMatches[widget.index].team2.name}') {
-                collectionRef.doc(doc.id).update(
-                  {
-                    'bets': {widget.user: '$_dropDownValue1$_dropDownValue2'}
-                  },
-                );
-              }
-            }
-          });
+          await collectionRef.doc().set(
+            {
+              'designation': LolEsportApi.previousMatches[widget.index].designation(),
+              'result': LolEsportApi.previousMatches[widget.index].score(),
+              'bets': {widget.user: '$_dropDownValue1$_dropDownValue2'}
+            },
+          );
         }
+      } catch (e) {
+        rethrow;
       }
     }
 
@@ -93,7 +75,7 @@ class _PronoState extends State<Prono> {
       child: Row(
         children: [
           Image.network(
-            LolEsportApi.previousMatches[widget.index].team1.imageUrl,
+            LolEsportApi.previousMatches[widget.index].teamA.imageUrl,
             height: 50,
             width: 50,
           ),
@@ -117,7 +99,7 @@ class _PronoState extends State<Prono> {
           ),
           const SizedBox(width: 50),
           Image.network(
-            LolEsportApi.previousMatches[widget.index].team2.imageUrl,
+            LolEsportApi.previousMatches[widget.index].teamB.imageUrl,
             height: 50,
             width: 50,
           ),

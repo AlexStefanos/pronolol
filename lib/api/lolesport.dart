@@ -15,19 +15,27 @@ class Team {
 }
 
 class Match {
-  final Team team1;
-  final Team team2;
+  final Team teamA;
+  final Team teamB;
   final int scoreA;
   final int scoreB;
 
-  Match(this.team1, this.team2, {this.scoreA = 0, this.scoreB = 0});
+  Match(this.teamA, this.teamB, {this.scoreA = 0, this.scoreB = 0});
 
   @override
   String toString() {
     if (scoreA == 0 && scoreB == 0) {
-      return '$team1 TBD - TBD $team2';
+      return '$teamA TBD - TBD $teamB';
     }
-    return '$team1 $scoreA - $scoreB $team2';
+    return '$teamA $scoreA - $scoreB $teamB';
+  }
+
+  String designation() {
+    return '$teamA-$teamB';
+  }
+
+  String score() {
+    return '$scoreA$scoreB';
   }
 }
 
