@@ -21,6 +21,9 @@ class _PronoState extends State<Prono> {
   @override
   Widget build(BuildContext context) {
     void sendProno() {
+      /*TODO : j'aimerai parcourir les documents de pronostics pour savoir si un document dans la bdd a déjà été créé pour un match ou non.
+                    Exemple : Avant de créer un document pour le match PSG-BDS par exemple, on parcourt la bdd pour savoir si il y a un doc qui lui est attribué
+              Puis, ce sera aussi pratique pour savoir si quelqu'un a déjà fait ses pronos ou non.*/
       bool result = false;
       var collectionRef = FirebaseFirestore.instance.collection('pronostics');
       // try {
