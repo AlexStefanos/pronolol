@@ -28,7 +28,7 @@ class _MatchPageState extends State<Matches> {
   }
 
   void seeLeaderboard() {
-    showModalBottomSheet(context: context, builder: (ctx) => Leaderboard());
+    showModalBottomSheet(context: context, builder: (ctx) => const Leaderboard());
   }
 
   @override
@@ -81,7 +81,7 @@ class _MatchPageState extends State<Matches> {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: LolEsportApi.previousMatches.length,
+              itemCount: LolEsportApi.matches.length,
               itemBuilder: (ctx, i) => MatchItem(i, user),
             ),
           ),

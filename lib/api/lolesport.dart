@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:http/http.dart' as http;
 import 'package:html/dom.dart' as dom;
 import 'package:pronolol/data/teams_data.dart';
@@ -19,14 +21,12 @@ class Match {
   final Team teamB;
   final int scoreA;
   final int scoreB;
+  final int bo;
 
-  Match(this.teamA, this.teamB, {this.scoreA = 0, this.scoreB = 0});
+  Match(this.teamA, this.teamB, this.bo, {this.scoreA = 0, this.scoreB = 0});
 
   @override
   String toString() {
-    if (scoreA == 0 && scoreB == 0) {
-      return '$teamA TBD - TBD $teamB';
-    }
     return '$teamA $scoreA - $scoreB $teamB';
   }
 
@@ -40,14 +40,12 @@ class Match {
 }
 
 class LolEsportApi {
-  static List<Match> previousMatches = [];
-  static List<Match> futureMatches = [];
+  static List<Match> matches = [];
 
   static Future getWebsiteData() async {
-    LolEsportApi.previousMatches = [];
-    LolEsportApi.futureMatches = [];
+    LolEsportApi.matches = [];
     final url = Uri.parse(
-        'https://lol.fandom.com/wiki/2023_Season_World_Championship/Play-In');
+        'https://lol.fandom.com/wiki/2023_Season_World_Championship/Main_Event');
     final response = await http.get(url);
     dom.Document html = dom.Document.html(response.body);
 
@@ -59,35 +57,61 @@ class LolEsportApi {
       if (games[i].attributes.containsKey('data-highlight-row') &&
           games[i].attributes['data-highlight-row'] ==
               currentRowNumber.toString()) {
-        final names =
-            games[i].getElementsByClassName('teamname').map((e) => e.text);
-
-        if (names.length != 2) {
+        final teams = _computeTeams(games[i]);
+        if (teams.isEmpty) {
           continue;
         }
 
-        final teams = [];
-        for (int j = 0; j < 2; j++) {
-          teams.add(Team(names.elementAt(j), teamsLogo[names.elementAt(j)]!));
-        }
+        final score = _computeScore(games[i]);
+        final bo = _computeBo(games[i], score);
 
-        final score = games[i]
-            .getElementsByTagName('td')
-            .map((e) => e.text)
-            .elementAt(2)
-            .split(' - ');
-
-        if (score.contains('TBD')) {
-          LolEsportApi.futureMatches.add(Match(teams.first, teams.last));
+        if (score.length != 2) {
+          LolEsportApi.matches.add(Match(teams.first, teams.last, bo));
         } else {
-          LolEsportApi.previousMatches.add(Match(teams.first, teams.last,
+          LolEsportApi.matches.add(Match(teams.first, teams.last, bo,
               scoreA: int.parse(score[0]), scoreB: int.parse(score[1])));
-          currentRowNumber++;
+        }
+        currentRowNumber++;
+      }
+    }
+    log(LolEsportApi.matches.toString());
+    LolEsportApi.matches = List.from(LolEsportApi.matches.reversed);
+  }
+
+  static List<Team> _computeTeams(dom.Element game) {
+    final List<Team> teams = [];
+    final names = game.getElementsByClassName('teamname').map((e) => e.text);
+    if (names.length == 2) {
+      for (int j = 0; j < 2; j++) {
+        if (names.elementAt(j).contains('TBD')) {
+          teams.add(Team(names.elementAt(j),
+              'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/TBD-W.svg/1200px-TBD-W.svg.png'));
+        } else {
+          teams.add(Team(names.elementAt(j), teamsLogo[names.elementAt(j)]!));
         }
       }
     }
-    LolEsportApi.previousMatches =
-        List.from(LolEsportApi.previousMatches.reversed);
-    LolEsportApi.futureMatches = List.from(LolEsportApi.futureMatches.reversed);
+    return teams;
+  }
+
+  static List<String> _computeScore(dom.Element game) {
+    return game
+        .getElementsByTagName('td')
+        .map((e) => e.text)
+        .elementAt(2)
+        .split(' - ')
+        .map((e) => e == 'TBD' ? '0' : e)
+        .toList();
+  }
+
+  static int _computeBo(dom.Element game, List<String> score) {
+    var bo = int.parse(game.firstChild?.attributes['rowspan'] ?? '1');
+    if (bo % 2 == 0) {
+      bo++;
+    }
+    if (bo != 1 && score.length == 2 && (int.parse(score[0]) == bo || int.parse(score[1]) == bo)) {
+      bo += 2;
+    }
+    return bo;
   }
 }

@@ -25,15 +25,15 @@ class MatchItem extends StatelessWidget {
           children: [
             const SizedBox(width: 5),
             Image.network(
-              LolEsportApi.previousMatches[index].teamA.imageUrl,
+              LolEsportApi.matches[index].teamA.imageUrl,
               height: 50,
               width: 50,
             ),
             const SizedBox(width: 10),
-            Text(LolEsportApi.previousMatches[index].toString()),
+            Text(LolEsportApi.matches[index].toString()),
             const SizedBox(width: 10),
             Image.network(
-              LolEsportApi.previousMatches[index].teamB.imageUrl,
+              LolEsportApi.matches[index].teamB.imageUrl,
               height: 50,
               width: 50,
             ),

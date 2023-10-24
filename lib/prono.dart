@@ -26,13 +26,12 @@ class _PronoState extends State<Prono> {
       if (widget.user == '-') {
         return;
       }
-
       var collectionRef = FirebaseFirestore.instance.collection('pronostics');
       try {
         var bettingMatchDoc = await collectionRef
             .where("designation",
                 isEqualTo:
-                    LolEsportApi.previousMatches[widget.index].designation())
+                    LolEsportApi.matches[widget.index].designation())
             .get();
         if (bettingMatchDoc.size > 0) {
           await bettingMatchDoc.docs.first.reference.update(
@@ -43,8 +42,8 @@ class _PronoState extends State<Prono> {
         } else {
           await collectionRef.doc().set(
             {
-              'designation': LolEsportApi.previousMatches[widget.index].designation(),
-              'result': LolEsportApi.previousMatches[widget.index].score(),
+              'designation': LolEsportApi.matches[widget.index].designation(),
+              'result': LolEsportApi.matches[widget.index].score(),
               'bets': {widget.user: '$_dropDownValue1$_dropDownValue2'}
             },
           );
@@ -75,7 +74,7 @@ class _PronoState extends State<Prono> {
       child: Row(
         children: [
           Image.network(
-            LolEsportApi.previousMatches[widget.index].teamA.imageUrl,
+            LolEsportApi.matches[widget.index].teamA.imageUrl,
             height: 50,
             width: 50,
           ),
@@ -99,7 +98,7 @@ class _PronoState extends State<Prono> {
           ),
           const SizedBox(width: 50),
           Image.network(
-            LolEsportApi.previousMatches[widget.index].teamB.imageUrl,
+            LolEsportApi.matches[widget.index].teamB.imageUrl,
             height: 50,
             width: 50,
           ),
