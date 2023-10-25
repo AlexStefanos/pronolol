@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:pronolol/api/firebase.dart';
 import 'package:pronolol/api/lolesport.dart';
@@ -11,8 +13,18 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await FirebaseApi().initNotifications();
+  await FirebaseApi.initNotifications();
   await LolEsportApi.getWebsiteData();
+  await FirebaseApi.getAllUsersBets();
+  int total = 0;
+  final userBets =
+      FirebaseApi.bets.where((data) => data['bets'].keys.contains('Tristan'));
+  for (Map<String, dynamic> userBet in userBets) {
+    if (userBet['bets']['Caribou'] == userBet['result']) {
+      total += 2;
+    }
+  }
+  log(total.toString());
   runApp(const PronololApp());
 }
 

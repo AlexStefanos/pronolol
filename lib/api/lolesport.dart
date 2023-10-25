@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:http/http.dart' as http;
 import 'package:html/dom.dart' as dom;
 import 'package:pronolol/data/teams_data.dart';
@@ -74,7 +72,6 @@ class LolEsportApi {
         currentRowNumber++;
       }
     }
-    log(LolEsportApi.matches.toString());
     LolEsportApi.matches = List.from(LolEsportApi.matches.reversed);
   }
 
