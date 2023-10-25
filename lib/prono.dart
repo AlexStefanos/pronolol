@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pronolol/api/lolesport.dart';
@@ -29,14 +27,16 @@ class _PronoState extends State<Prono> {
       var collectionRef = FirebaseFirestore.instance.collection('pronostics');
       try {
         var bettingMatchDoc = await collectionRef
-            .where("designation",
-                isEqualTo:
-                    LolEsportApi.matches[widget.index].designation())
+            .where('designation',
+                isEqualTo: LolEsportApi.matches[widget.index].designation())
             .get();
         if (bettingMatchDoc.size > 0) {
           await bettingMatchDoc.docs.first.reference.update(
             {
-              'bets': {...bettingMatchDoc.docs.first.data()['bets'], widget.user: '$_dropDownValue1$_dropDownValue2'}
+              'bets': {
+                ...bettingMatchDoc.docs.first.data()['bets'],
+                widget.user: '$_dropDownValue1$_dropDownValue2'
+              }
             },
           );
         } else {
@@ -53,17 +53,10 @@ class _PronoState extends State<Prono> {
       }
     }
 
-    void dropDownCallback1(int? selectedValue) {
+    void dropDownCallback(int? selectedValue) {
       if (selectedValue is int) {
         setState(() {
           _dropDownValue1 = selectedValue;
-        });
-      }
-    }
-
-    void dropDownCallback2(int? selectedValue) {
-      if (selectedValue is int) {
-        setState(() {
           _dropDownValue2 = selectedValue;
         });
       }
@@ -94,7 +87,7 @@ class _PronoState extends State<Prono> {
               ),
             ],
             value: _dropDownValue1,
-            onChanged: dropDownCallback1,
+            onChanged: dropDownCallback,
           ),
           const SizedBox(width: 50),
           Image.network(
@@ -118,7 +111,7 @@ class _PronoState extends State<Prono> {
               ),
             ],
             value: _dropDownValue2,
-            onChanged: dropDownCallback2,
+            onChanged: dropDownCallback,
           ),
           IconButton(
             onPressed: (_dropDownValue1 != _dropDownValue2)

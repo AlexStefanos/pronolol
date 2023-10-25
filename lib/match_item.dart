@@ -21,23 +21,22 @@ class MatchItem extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            const SizedBox(width: 5),
             Image.network(
               LolEsportApi.matches[index].teamA.imageUrl,
               height: 50,
               width: 50,
+              alignment: Alignment.centerLeft,
             ),
-            const SizedBox(width: 10),
             Text(LolEsportApi.matches[index].toString()),
-            const SizedBox(width: 10),
             Image.network(
               LolEsportApi.matches[index].teamB.imageUrl,
               height: 50,
               width: 50,
+              alignment: Alignment.centerLeft,
             ),
-            const SizedBox(width: 45),
+            const SizedBox(width: 30),
             IconButton(
               onPressed: addPronoOverlay,
               icon: const Icon(Icons.bento),
