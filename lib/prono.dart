@@ -24,7 +24,7 @@ class _PronoState extends State<Prono> {
       if (widget.user == '-') {
         return;
       }
-      var collectionRef = FirebaseFirestore.instance.collection('pronostics');
+      var collectionRef = FirebaseFirestore.instance.collection('pronolol');
       try {
         var bettingMatchDoc = await collectionRef
             .where('designation',

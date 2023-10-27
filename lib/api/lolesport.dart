@@ -29,6 +29,9 @@ class Match {
   }
 
   String designation() {
+    if (teamA.name == "TBD" && teamB.name == "TBD") {
+      return '';
+    }
     return '$teamA-$teamB';
   }
 
@@ -106,7 +109,9 @@ class LolEsportApi {
     if (bo % 2 == 0) {
       bo++;
     }
-    if (bo != 1 && score.length == 2 && (int.parse(score[0]) == bo || int.parse(score[1]) == bo)) {
+    if (bo != 1 &&
+        score.length == 2 &&
+        (int.parse(score[0]) == bo || int.parse(score[1]) == bo)) {
       bo += 2;
     }
     return bo;

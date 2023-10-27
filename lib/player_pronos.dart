@@ -20,7 +20,7 @@ class _PlayerPronoState extends State<PlayerProno> {
   @override
   Widget build(BuildContext context) {
     void getClientStream() async {
-      var collectionRef = FirebaseFirestore.instance.collection('pronostics');
+      var collectionRef = FirebaseFirestore.instance.collection('pronolol');
       collectionRef.get().then((QuerySnapshot qS) {
         for (var doc in qS.docs) {
           if (doc['name'] == widget.user) {

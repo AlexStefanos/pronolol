@@ -15,16 +15,8 @@ void main() async {
   );
   await FirebaseApi.initNotifications();
   await LolEsportApi.getWebsiteData();
+  await FirebaseApi.addNewMatches();
   await FirebaseApi.getAllUsersBets();
-  int total = 0;
-  final userBets =
-      FirebaseApi.bets.where((data) => data['bets'].keys.contains('Tristan'));
-  for (Map<String, dynamic> userBet in userBets) {
-    if (userBet['bets']['Caribou'] == userBet['result']) {
-      total += 2;
-    }
-  }
-  log(total.toString());
   runApp(const PronololApp());
 }
 
