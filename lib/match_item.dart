@@ -3,17 +3,17 @@ import 'package:pronolol/api/lolesport.dart';
 import 'package:pronolol/prono.dart';
 
 class MatchItem extends StatelessWidget {
-  final int index;
+  final Match match;
   final String user;
 
-  const MatchItem(this.index, this.user, {super.key});
+  const MatchItem(this.match, this.user, {super.key});
 
   @override
   Widget build(BuildContext context) {
     void addPronoOverlay() {
       showModalBottomSheet(
         context: context,
-        builder: (ctx) => Prono(index, user),
+        builder: (ctx) => Prono(match, user),
       );
     }
 
@@ -24,14 +24,14 @@ class MatchItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Image.network(
-              LolEsportApi.matches[index].teamA.imageUrl,
+              match.teamA.imageUrl,
               height: 50,
               width: 50,
               alignment: Alignment.centerLeft,
             ),
-            Text(LolEsportApi.matches[index].toString()),
+            Text(match.toString()),
             Image.network(
-              LolEsportApi.matches[index].teamB.imageUrl,
+              match.teamB.imageUrl,
               height: 50,
               width: 50,
               alignment: Alignment.centerLeft,

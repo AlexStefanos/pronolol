@@ -10,7 +10,7 @@ class Player {
   Future<int> calculatingTotalPoints() async {
     int total = 0;
     final userBets =
-        FirebaseApi.bets.where((data) => data['bets'].keys.contains(name));
+        FirebaseApi.matches.where((data) => data['bets'].keys.contains(name));
     for (Map<String, dynamic> userBet in userBets) {
       final winnerTeamIndex = getWinnerTeamIndex(userBet['result']);
       if (userBet['bets']['name'][winnerTeamIndex] == userBet['result']) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pronolol/api/firebase.dart';
 import 'package:pronolol/api/lolesport.dart';
 import 'package:pronolol/leaderboard.dart';
 import 'package:pronolol/match_item.dart';
@@ -28,7 +29,8 @@ class _MatchPageState extends State<Matches> {
   }
 
   void seeLeaderboard() {
-    showModalBottomSheet(context: context, builder: (ctx) => const Leaderboard());
+    showModalBottomSheet(
+        context: context, builder: (ctx) => const Leaderboard());
   }
 
   @override
@@ -81,14 +83,14 @@ class _MatchPageState extends State<Matches> {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: LolEsportApi.matches.length,
-              itemBuilder: (ctx, i) => MatchItem(i, user),
+              itemCount: FirebaseApi.matches.length,
+              itemBuilder: (ctx, i) => MatchItem(FirebaseApi.matches[i], user),
             ),
           ),
         ],
       ),
       floatingActionButton:
-          FloatingActionButton(onPressed: () => seeLeaderboard()),
+          FloatingActionButton(onPressed: () => FirebaseApi.updateDbMatches()),
     );
   }
 }

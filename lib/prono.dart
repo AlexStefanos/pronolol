@@ -3,10 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pronolol/api/lolesport.dart';
 
 class Prono extends StatefulWidget {
-  final int index;
+  final Match match;
   final String user;
 
-  const Prono(this.index, this.user, {super.key});
+  const Prono(this.match, this.user, {super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -27,8 +27,7 @@ class _PronoState extends State<Prono> {
       var collectionRef = FirebaseFirestore.instance.collection('pronolol');
       try {
         var bettingMatchDoc = await collectionRef
-            .where('designation',
-                isEqualTo: LolEsportApi.matches[widget.index].designation())
+            .where('designation', isEqualTo: widget.match.designation())
             .get();
         if (bettingMatchDoc.size > 0) {
           await bettingMatchDoc.docs.first.reference.update(
@@ -42,8 +41,8 @@ class _PronoState extends State<Prono> {
         } else {
           await collectionRef.doc().set(
             {
-              'designation': LolEsportApi.matches[widget.index].designation(),
-              'result': LolEsportApi.matches[widget.index].score(),
+              'designation': widget.match.designation(),
+              'result': widget.match.score(),
               'bets': {widget.user: '$_dropDownValue1$_dropDownValue2'}
             },
           );
@@ -67,7 +66,7 @@ class _PronoState extends State<Prono> {
       child: Row(
         children: [
           Image.network(
-            LolEsportApi.matches[widget.index].teamA.imageUrl,
+            widget.match.teamA.imageUrl,
             height: 50,
             width: 50,
           ),
@@ -91,7 +90,7 @@ class _PronoState extends State<Prono> {
           ),
           const SizedBox(width: 50),
           Image.network(
-            LolEsportApi.matches[widget.index].teamB.imageUrl,
+            widget.match.teamB.imageUrl,
             height: 50,
             width: 50,
           ),
