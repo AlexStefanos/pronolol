@@ -84,7 +84,8 @@ class _MatchPageState extends State<Matches> {
           Expanded(
             child: ListView.builder(
               itemCount: FirebaseApi.matches.length,
-              itemBuilder: (ctx, i) => MatchItem(FirebaseApi.matches[i], user),
+              itemBuilder: (ctx, i) =>
+                  MatchItem(FirebaseApi.matches[i].match, user),
             ),
           ),
         ],

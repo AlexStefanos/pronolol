@@ -14,7 +14,7 @@ void main() async {
   await FirebaseApi.initNotifications();
   await LolEsportApi.getWebsiteData();
   await FirebaseApi.updateDbMatches();
-  await FirebaseApi.getAllUsersBets();
+  await FirebaseApi.fetchAllMatches();
   runApp(const PronololApp());
 }
 
