@@ -1,10 +1,10 @@
-import 'package:pronolol/models/country_model.dart';
-import 'package:pronolol/models/match_model.dart';
-
 class Team {
-  const Team(this.name, this.country, this.history);
+  const Team(this.name, this.score);
 
   final String name;
-  final Country country;
-  final List<Match> history;
+  final int score;
+
+  static Team fromFirebase(Map<String, dynamic> data){
+    return Team(data['name'], data['score']);
+  }
 }
