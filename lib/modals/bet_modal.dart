@@ -117,10 +117,9 @@ class _BetModalState extends State<BetModal> {
               }),
             )
           ]),
-          // TODO: Replace user
           IconButton(
-              onPressed: () async => await FirebaseApi.bet(
-                  widget.match.id, "Caribou", bet1!, bet2!),
+              onPressed: () async =>
+                  await FirebaseApi.predict(widget.match.id, bet1!, bet2!),
               icon: const Icon(Icons.check))
         ]
       ]),

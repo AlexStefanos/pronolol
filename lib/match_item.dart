@@ -19,22 +19,34 @@ class MatchItem extends StatelessWidget {
         });
   }
 
+  MaterialColor getMatchColor() {
+    if (isFutureMatch) {
+      if (match.hasPredicted()) {
+        if (match.hasPerfectWin()) {
+          return Colors.amber;
+        } else if (match.hasWin()) {
+          return Colors.green;
+        } else {
+          return Colors.red;
+        }
+      } else {
+        return Colors.grey;
+      }
+    } else {
+      if (match.canPredict()) {
+        return Colors.teal;
+      } else {
+        return Colors.grey;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => isFutureMatch ? openMatchPage() : showBetModal(context),
       child: Card(
-        color: isFutureMatch
-            ? match.hasPredicted()
-                ? match.hasPerfectWin()
-                    ? Colors.amber
-                    : match.hasWin()
-                        ? Colors.green
-                        : Colors.red
-                : Colors.grey
-            : match.canPredict()
-                ? Colors.teal
-                : Colors.grey,
+        color: getMatchColor(),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
           child: Row(

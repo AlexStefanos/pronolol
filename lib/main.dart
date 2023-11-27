@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pronolol/api/firebase.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:pronolol/models/user_model.dart';
 import 'package:pronolol/pages/home_page.dart';
 
 import 'firebase_options.dart';
@@ -11,6 +12,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await FirebaseApi.initNotifications();
+  await User.getUser();
   runApp(const PronololApp());
 }
 

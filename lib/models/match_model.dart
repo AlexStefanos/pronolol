@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:pronolol/models/team_model.dart';
 import 'package:intl/intl.dart';
+import 'package:pronolol/models/user_model.dart';
 
 final formatter = DateFormat('dd/M/y');
 
@@ -28,22 +31,22 @@ class Match {
   }
 
   bool canPredict() {
-    return date.isAfter(DateTime.now()) && predictions['Caribou'] == null;
+    return date.isAfter(DateTime.now()) && predictions[User.name] == null;
   }
 
   bool hasPredicted() {
-    return predictions['Caribou'] != null;
+    return predictions[User.name] != null;
   }
 
   bool hasWin() {
     return (team1.score > team2.score &&
-            predictions['Caribou'][0] == team1.score) ||
-        (team1.score < team2.score && predictions['Caribou'][1] == team2.score);
+            predictions[User.name][0] == team1.score) ||
+        (team1.score < team2.score && predictions[User.name][1] == team2.score);
   }
 
   bool hasPerfectWin() {
-    return predictions['Caribou'][0] == team1.score &&
-        predictions['Caribou'][1] == team2.score;
+    return predictions[User.name][0] == team1.score &&
+        predictions[User.name][1] == team2.score;
   }
 
   @override
