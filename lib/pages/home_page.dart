@@ -5,6 +5,8 @@ import 'package:pronolol/match_item.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
+  static const user = "Caribou";
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -26,31 +28,30 @@ class HomePage extends StatelessWidget {
               builder: (ctx, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   return ListView.builder(
-                    itemCount: FirebaseApi.sortedBetMatchesByDateDesc.length,
+                    itemCount: FirebaseApi.futureMatches.length,
                     itemBuilder: (ctx, i) =>
-                        MatchItem(FirebaseApi.sortedBetMatchesByDateDesc[i]),
+                        MatchItem(FirebaseApi.futureMatches[i], false),
                   );
                 } else {
                   return const Center(child: CircularProgressIndicator());
                 }
               },
-              future: FirebaseApi.fetchNextMatches(),
+              future: FirebaseApi.getFutureMatches(),
             ),
             FutureBuilder(
               builder: (ctx, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   return ListView.builder(
-                    itemCount: FirebaseApi.sortedMatchesByDateDesc.length,
+                    itemCount: FirebaseApi.pastOrPredictedMatches.length,
                     itemBuilder: (ctx, i) =>
-                        MatchItem(FirebaseApi.sortedMatchesByDateDesc[i]),
+                        MatchItem(FirebaseApi.pastOrPredictedMatches[i], true),
                   );
                 } else {
                   return const Center(child: CircularProgressIndicator());
                 }
               },
-              future: FirebaseApi.fetchLastMatches(10),
+              future: FirebaseApi.getPastMatches(),
             ),
-            
           ])),
     );
   }

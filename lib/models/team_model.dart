@@ -3,8 +3,4 @@ class Team {
 
   final String name;
   final int score;
-
-  static Team fromFirebase(Map<String, dynamic> data){
-    return Team(data['name'], data['score']);
-  }
 }

@@ -1,4 +1,3 @@
-
 const Map<String, String> teamsLogo = {
   'GEN':
       'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/e/e3/Gen.Glogo_square.png/revision/latest/scale-to-width-down/123?cb=20210604213244',
@@ -43,5 +42,17 @@ const Map<String, String> teamsLogo = {
   'R7':
       'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/2/2a/Movistar_R7logo_square.png/revision/latest/scale-to-width-down/123?cb=20210604213244',
   'LLL':
-      'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/7/76/LOUDlogo_square.png/revision/latest/scale-to-width-down/123?cb=20210604213244'
+      'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/7/76/LOUDlogo_square.png/revision/latest/scale-to-width-down/123?cb=20210604213244',
+  'VIT':
+      'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/6/63/Team_Vitalitylogo_std.png/revision/latest/scale-to-width-down/123?cb=20230224185634',
+  'AST':
+      'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/3/37/Astralislogo_std.png/revision/latest/scale-to-width-down/123?cb=20201206160533',
+  'KOI':
+      'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/e/e5/KOI_%28Spanish_Team%29logo_std.png/revision/latest/scale-to-width-down/123?cb=20221224092134',
+  'SK':
+      'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/e/e3/SK_Gaminglogo_std.png/revision/latest/scale-to-width-down/123?cb=20221129151514',
+  'TH':
+      'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/c/c0/Team_Hereticslogo_std.png/revision/latest/scale-to-width-down/123?cb=20221027072632',
+  'XL':
+      'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/b/b5/Excel_Esportslogo_std.png/revision/latest/scale-to-width-down/123?cb=20201119153406'
 };
