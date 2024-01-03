@@ -57,7 +57,10 @@ class FirebaseApi {
 
   static Future<void> predict(String id, int score1, int score2) async {
     await _firebaseFirestore.collection(pronololPath).doc(id).set({
-      'predictions${User.name}': [score1, score2]
+      'predictions': {
+        User.name,
+        [score1, score2]
+      }
     }, SetOptions(merge: true));
   }
 
