@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:pronolol/models/team_model.dart';
 import 'package:intl/intl.dart';
 import 'package:pronolol/models/user_model.dart';
