@@ -43,6 +43,7 @@ class _BetModalState extends State<BetModal> {
             GestureDetector(
               onTap: () => setState(() {
                 winner = widget.match.team1;
+                bet1 = (widget.match.bo / 2).ceil();
               }),
               child: Container(
                 padding: const EdgeInsets.all(15),
@@ -69,6 +70,7 @@ class _BetModalState extends State<BetModal> {
               onTap: () {
                 setState(() {
                   winner = widget.match.team2;
+                  bet2 = (widget.match.bo / 2).ceil();
                 });
               },
               child: Container(
@@ -119,7 +121,7 @@ class _BetModalState extends State<BetModal> {
           ]),
           IconButton(
               onPressed: () async =>
-                  await FirebaseApi.predict(widget.match.id, bet1!, bet2!),
+                  await FirebaseApi.predict(widget.match.id, '$bet1$bet2'),
               icon: const Icon(Icons.check))
         ]
       ]),

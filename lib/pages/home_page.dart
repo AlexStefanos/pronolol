@@ -40,15 +40,15 @@ class _HomePageState extends State<HomePage> {
                     await User.showSelectUserModal(context);
                     setState(() {});
                   },
-                  child: Text(User.name ?? "")),
+                  child: Text(User.name ?? '')),
             )
           ],
           bottom: const TabBar(tabs: [
             Tab(
-              text: "À venir",
+              text: 'À venir',
             ),
             Tab(
-              text: "Passés",
+              text: 'Passés',
             )
           ]),
         ),
@@ -59,7 +59,7 @@ class _HomePageState extends State<HomePage> {
                 return ListView.builder(
                   itemCount: FirebaseApi.futureMatches.length,
                   itemBuilder: (ctx, i) =>
-                      MatchItem(FirebaseApi.futureMatches[i], false),
+                      MatchItem(FirebaseApi.futureMatches[i]),
                 );
               } else {
                 return const Center(child: CircularProgressIndicator());
@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
                 return ListView.builder(
                   itemCount: FirebaseApi.pastOrPredictedMatches.length,
                   itemBuilder: (ctx, i) =>
-                      MatchItem(FirebaseApi.pastOrPredictedMatches[i], true),
+                      MatchItem(FirebaseApi.pastOrPredictedMatches[i]),
                 );
               } else {
                 return const Center(child: CircularProgressIndicator());
@@ -91,7 +91,8 @@ class _HomePageState extends State<HomePage> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const PredictionsPage()));
+                    builder: (context) =>
+                        PredictionsPage(User.name.toString())));
           },
         ),
       ),

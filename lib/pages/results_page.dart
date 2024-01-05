@@ -4,7 +4,8 @@ import 'package:pronolol/items/match_item.dart';
 import 'package:pronolol/items/player_item.dart';
 
 class PredictionsPage extends StatefulWidget {
-  const PredictionsPage({super.key});
+  final String username;
+  const PredictionsPage(this.username, {super.key});
 
   @override
   State<PredictionsPage> createState() => _PredictionsPageState();
@@ -24,10 +25,10 @@ class _PredictionsPageState extends State<PredictionsPage> {
         appBar: AppBar(
           bottom: const TabBar(tabs: [
             Tab(
-              text: "Mes Pronos",
+              text: 'Mes Pronos',
             ),
             Tab(
-              text: "Classement",
+              text: 'Classement',
             )
           ]),
         ),
@@ -36,15 +37,15 @@ class _PredictionsPageState extends State<PredictionsPage> {
             builder: (ctx, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 return ListView.builder(
-                  itemCount: FirebaseApi.predictionsPully.length,
+                  itemCount: FirebaseApi.playerPredictions.length,
                   itemBuilder: (ctx, i) =>
-                      MatchItem(FirebaseApi.predictionsPully[i], true),
+                      MatchItem(FirebaseApi.playerPredictions[i]),
                 );
               } else {
                 return const Center(child: CircularProgressIndicator());
               }
             },
-            future: FirebaseApi.getPlayersPredictions(),
+            future: FirebaseApi.getPlayersPredictions(widget.username),
           ),
           FutureBuilder(
             builder: (ctx, snapshot) {

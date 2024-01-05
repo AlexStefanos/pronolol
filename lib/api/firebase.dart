@@ -9,7 +9,7 @@ import 'package:pronolol/models/player_model.dart';
 import 'package:pronolol/models/user_model.dart';
 
 class FirebaseApi {
-  static const pronololPath = "test";
+  static const pronololPath = 'test';
   static final _firebaseMessaging = FirebaseMessaging.instance;
   static final _firebaseFirestore = FirebaseFirestore.instance;
 
@@ -17,8 +17,7 @@ class FirebaseApi {
   static List<Match> sortedMatchesByDateDesc = [];
   static List<Match> futureMatches = [];
   static List<Match> pastOrPredictedMatches = [];
-  static List<Match> predictionsPully =
-      []; //=> une List<List<Match>> avec tous les joueurs ? ou on garde une liste/joueur
+  static List<Match> playerPredictions = [];
   static List<Player> playersRanking = getPlayersRanking();
 
   static Future<void> initNotifications() async {
@@ -29,8 +28,8 @@ class FirebaseApi {
     try {
       final docRefs = await _firebaseFirestore
           .collection(pronololPath)
-          .where("date", isGreaterThanOrEqualTo: DateTime.now())
-          .orderBy("date", descending: true)
+          .where('date', isGreaterThanOrEqualTo: DateTime.now())
+          .orderBy('date', descending: true)
           .get();
 
       futureMatches =
@@ -44,8 +43,8 @@ class FirebaseApi {
     try {
       final docRefs = await _firebaseFirestore
           .collection(pronololPath)
-          .where("date", isLessThan: DateTime.now())
-          .orderBy("date", descending: true)
+          .where('date', isLessThan: DateTime.now())
+          .orderBy('date', descending: true)
           .get();
 
       pastOrPredictedMatches =
@@ -55,24 +54,21 @@ class FirebaseApi {
     }
   }
 
-  static Future<void> predict(String id, int score1, int score2) async {
+  static Future<void> predict(String id, String score) async {
     await _firebaseFirestore.collection(pronololPath).doc(id).set({
-      'predictions': {
-        User.name,
-        [score1, score2]
-      }
+      'predictions': {User.name: score}
     }, SetOptions(merge: true));
   }
 
-  static Future<void> getPlayersPredictions() async {
+  static Future<void> getPlayersPredictions(String username) async {
     try {
       final docRefs = await _firebaseFirestore
           .collection(pronololPath)
-          .where("predictionsPully")
-          .orderBy("date", descending: true)
+          .where('predictions')
+          .orderBy('date', descending: true)
           .get();
 
-      predictionsPully =
+      playerPredictions =
           docRefs.docs.map((e) => Match.fromFirebase(e.id, e.data())).toList();
     } catch (e) {
       log(e.toString());

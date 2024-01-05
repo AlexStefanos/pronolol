@@ -5,9 +5,8 @@ import 'package:pronolol/models/match_model.dart';
 
 class MatchItem extends StatelessWidget {
   final Match match;
-  final bool isFutureMatch;
 
-  const MatchItem(this.match, this.isFutureMatch, {super.key});
+  const MatchItem(this.match, {super.key});
 
   void openMatchPage() {}
 
@@ -20,7 +19,7 @@ class MatchItem extends StatelessWidget {
   }
 
   MaterialColor getMatchColor() {
-    if (isFutureMatch) {
+    if (!match.isFutureMatch()) {
       if (match.hasPredicted()) {
         if (match.hasPerfectWin()) {
           return Colors.amber;
@@ -44,7 +43,10 @@ class MatchItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => isFutureMatch ? openMatchPage() : showBetModal(context),
+      onTap: () => (((match.isFutureMatch()) && (!match.canPredict())) ||
+              !match.isFutureMatch())
+          ? openMatchPage()
+          : showBetModal(context),
       child: Card(
         color: getMatchColor(),
         child: Padding(

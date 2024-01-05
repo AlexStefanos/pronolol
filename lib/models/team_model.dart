@@ -1,6 +1,5 @@
 class Team {
-  const Team(this.name, this.score);
+  const Team(this.name);
 
   final String name;
-  final int score;
 }
