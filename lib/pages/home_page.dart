@@ -57,10 +57,24 @@ class _HomePageState extends State<HomePage> {
             builder: (ctx, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 return ListView.builder(
-                  itemCount: FirebaseApi.futureMatches.length,
-                  itemBuilder: (ctx, i) =>
-                      MatchItem(FirebaseApi.futureMatches[i]),
-                );
+                    itemCount: FirebaseApi.futureMatches.length,
+                    itemBuilder: (ctx, i) => i == 0 ||
+                            FirebaseApi.futureMatches[i].date.day !=
+                                FirebaseApi.futureMatches[i - 1].date.day
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                                Center(
+                                  child: Text(
+                                      FirebaseApi
+                                          .futureMatches[i].literatureDate,
+                                      style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold)),
+                                ),
+                                MatchItem(FirebaseApi.futureMatches[i])
+                              ])
+                        : MatchItem(FirebaseApi.futureMatches[i]));
               } else {
                 return const Center(child: CircularProgressIndicator());
               }

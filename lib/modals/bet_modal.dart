@@ -3,6 +3,7 @@ import 'package:pronolol/api/firebase.dart';
 import 'package:pronolol/data/teams_data.dart';
 import 'package:pronolol/models/match_model.dart';
 import 'package:pronolol/models/team_model.dart';
+import 'package:pronolol/models/user_model.dart';
 
 class BetModal extends StatefulWidget {
   final Match match;
@@ -37,6 +38,7 @@ class _BetModalState extends State<BetModal> {
             child: Padding(
       padding: const EdgeInsets.all(10),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Text('BO: ${widget.match.bo} Date: ${widget.match.numericalDate}'),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -99,7 +101,7 @@ class _BetModalState extends State<BetModal> {
         if (winner != null) ...[
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             DropdownMenu<int>(
-              enabled: winner != widget.match.team1,
+              enabled: winner != widget.match.team1 && widget.match.bo > 1,
               initialSelection: winner == widget.match.team1
                   ? (widget.match.bo / 2).ceil()
                   : 0,
@@ -109,7 +111,7 @@ class _BetModalState extends State<BetModal> {
               }),
             ),
             DropdownMenu<int>(
-              enabled: winner != widget.match.team2,
+              enabled: winner != widget.match.team2 && widget.match.bo > 1,
               initialSelection: winner == widget.match.team2
                   ? (widget.match.bo / 2).ceil()
                   : 0,
@@ -120,8 +122,11 @@ class _BetModalState extends State<BetModal> {
             )
           ]),
           IconButton(
-              onPressed: () async =>
-                  await FirebaseApi.predict(widget.match.id, '$bet1$bet2'),
+              onPressed: () async {
+                await FirebaseApi.predict(widget.match.id, '$bet1$bet2');
+                widget.match.predictions[User.name ?? ''] = '$bet1$bet2';
+                Navigator.pop(context, '$bet1$bet2');
+              },
               icon: const Icon(Icons.check))
         ]
       ]),

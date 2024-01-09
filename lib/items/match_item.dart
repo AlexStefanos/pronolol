@@ -4,27 +4,35 @@ import 'package:pronolol/modals/bet_modal.dart';
 import 'package:pronolol/models/match_model.dart';
 import 'package:pronolol/models/user_model.dart';
 
-class MatchItem extends StatelessWidget {
+class MatchItem extends StatefulWidget {
   final Match match;
 
   const MatchItem(this.match, {super.key});
 
+  @override
+  State<MatchItem> createState() => _MatchItemState();
+}
+
+class _MatchItemState extends State<MatchItem> {
   void openMatchPage() {}
 
-  void showBetModal(BuildContext ctx) {
-    showDialog(
+  void showBetModal(BuildContext ctx) async {
+    var value = await showDialog(
         context: ctx,
         builder: (BuildContext context) {
-          return BetModal(match);
+          return BetModal(widget.match);
         });
+    setState(() {
+      widget.match.predictions[User.name ?? ''] = value;
+    });
   }
 
   MaterialColor getMatchColor() {
-    if (!match.isFutureMatch()) {
-      if (match.hasPredicted(User.name ?? '')) {
-        if (match.hasPerfectWin(User.name ?? '')) {
+    if (!widget.match.isFutureMatch()) {
+      if (widget.match.hasPredicted(User.name ?? '')) {
+        if (widget.match.hasPerfectWin(User.name ?? '')) {
           return Colors.amber;
-        } else if (match.hasWin(User.name ?? '')) {
+        } else if (widget.match.hasWin(User.name ?? '')) {
           return Colors.green;
         } else {
           return Colors.red;
@@ -33,7 +41,7 @@ class MatchItem extends StatelessWidget {
         return Colors.grey;
       }
     } else {
-      if (match.canPredict(User.name ?? '')) {
+      if (widget.match.canPredict(User.name ?? '')) {
         return Colors.teal;
       } else {
         return Colors.grey;
@@ -44,11 +52,11 @@ class MatchItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () =>
-          (((match.isFutureMatch()) && (!match.canPredict(User.name ?? ''))) ||
-                  !match.isFutureMatch())
-              ? openMatchPage()
-              : showBetModal(context),
+      onTap: () => (((widget.match.isFutureMatch()) &&
+                  (!widget.match.canPredict(User.name ?? ''))) ||
+              !widget.match.isFutureMatch())
+          ? openMatchPage()
+          : showBetModal(context),
       child: Card(
         color: getMatchColor(),
         child: Padding(
@@ -58,14 +66,14 @@ class MatchItem extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Image.network(
-                teamsLogo[match.team1.name]!,
+                teamsLogo[widget.match.team1.name]!,
                 height: 50,
                 width: 50,
                 alignment: Alignment.centerLeft,
               ),
-              Text(match.toString()),
+              Text(widget.match.toString()),
               Image.network(
-                teamsLogo[match.team2.name]!,
+                teamsLogo[widget.match.team2.name]!,
                 height: 50,
                 width: 50,
                 alignment: Alignment.centerLeft,

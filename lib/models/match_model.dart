@@ -1,11 +1,12 @@
 import 'package:pronolol/models/team_model.dart';
 import 'package:intl/intl.dart';
 
-final formatter = DateFormat('dd/M/y');
-
 class Match {
   Match(this.id, this.team1, this.team2, this.date, this.bo, this.score,
       this.predictions);
+
+  final _numericalFormat = DateFormat('dd/MM/y HH:mm', 'fr_FR');
+  final _literatureFormat = DateFormat('EEEE dd MMMM', 'fr_FR');
 
   final String id;
   final Team team1;
@@ -15,8 +16,12 @@ class Match {
   final String score;
   final Map<String, dynamic> predictions;
 
-  String get formattedDate {
-    return formatter.format(date);
+  String get numericalDate {
+    return _numericalFormat.format(date);
+  }
+
+  String get literatureDate {
+    return _literatureFormat.format(date).toUpperCase();
   }
 
   static Match fromFirebase(String id, Map<String, dynamic> data) {

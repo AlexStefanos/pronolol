@@ -1,7 +1,3 @@
-// ignore_for_file: must_be_immutable
-
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:pronolol/api/firebase.dart';
 import 'package:pronolol/data/players_data.dart';
@@ -11,11 +7,10 @@ import 'package:pronolol/models/player_model.dart';
 import 'package:pronolol/models/match_model.dart';
 
 class ResultsPage extends StatefulWidget {
-  List<Player> playerRanking = [];
+  final List<Player> playerRanking =
+      playersData.keys.map((key) => Player(key)).toList();
 
   ResultsPage({super.key}) {
-    playerRanking = playersData.keys.map((key) => Player(key)).toList();
-    log("test");
     for (Match match in FirebaseApi.pastMatches) {
       for (var prediction in match.predictions.entries) {
         if (match.hasPredicted(prediction.key)) {
@@ -27,16 +22,12 @@ class ResultsPage extends StatefulWidget {
             playerRanking
                 .firstWhere((player) => player.name == prediction.key)
                 .score += 1;
-          } else {
-            //totalScore += 0;
           }
-        } else {
-          //totalScore += 0;
         }
       }
-      playerRanking
-          .sort(((player1, player2) => player2.score.compareTo(player1.score)));
     }
+    playerRanking
+        .sort(((player1, player2) => player2.score.compareTo(player1.score)));
   }
 
   @override

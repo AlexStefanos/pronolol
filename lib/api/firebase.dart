@@ -29,7 +29,9 @@ class FirebaseApi {
       final docRefs = await _firebaseFirestore
           .collection(pronololPath)
           .where('date', isGreaterThanOrEqualTo: DateTime.now())
-          .orderBy('date', descending: true)
+          .where('date',
+              isLessThan: DateTime.now().add(const Duration(days: 7)))
+          .orderBy('date')
           .get();
 
       futureMatches =

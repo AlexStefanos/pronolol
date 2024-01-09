@@ -33,7 +33,7 @@ class PlayerItem extends StatelessWidget {
                 style: const TextStyle(fontSize: 17),
               ),
               const SizedBox(height: 5),
-              Text('${player.score} ($rank/6)'),
+              Text('${player.score} (${rank + 1}/6)'),
             ],
           ),
         ),
