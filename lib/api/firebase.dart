@@ -18,6 +18,7 @@ class FirebaseApi {
   static List<Match> futureMatches = [];
   static List<Match> pastMatches = [];
   static List<Match> predictedMatches = [];
+  static List<Match> playerPredictions = [];
   static List<Player> playersRanking = getPlayersRanking();
 
   static Future<void> initNotifications() async {
@@ -62,7 +63,7 @@ class FirebaseApi {
           .orderBy('date', descending: true)
           .get();
 
-      List<Match> tmp =
+      playerPredictions =
           docRefs.docs.map((e) => Match.fromFirebase(e.id, e.data())).toList();
     } catch (e) {
       log(e.toString());

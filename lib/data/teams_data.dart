@@ -19,7 +19,7 @@ const Map<String, String> teamsLogo = {
       'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/f/f8/KT_Rolsterlogo_square.png/revision/latest/scale-to-width-down/123?cb=20210604213244',
   'LNG':
       'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/d/d5/LNG_Esportslogo_square.png/revision/latest/scale-to-width-down/123?cb=20210604213244',
-  'MAD':
+  'MDK':
       'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/3/3c/MAD_Lionslogo_square.png/revision/latest/scale-to-width-down/123?cb=20210604213244',
   'TL':
       'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/f/f4/Team_Liquidlogo_square.png/revision/latest/scale-to-width-down/123?cb=20210604213244',
@@ -59,6 +59,6 @@ const Map<String, String> teamsLogo = {
       'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/a/a1/GIANTXlogo_square.png/revision/latest/scale-to-width-down/123?cb=20231214160222',
   'KC':
       'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/2/2d/Karmine_Corplogo_square.png/revision/latest/scale-to-width-down/123?cb=20221019054047',
-  'RGE':
+  'RGEX':
       'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/a/a4/Rogue_%28European_Team%29logo_square.png/revision/latest/scale-to-width-down/123?cb=20231125191715'
 };
