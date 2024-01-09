@@ -13,17 +13,39 @@ class ResultsPage extends StatefulWidget {
   ResultsPage({super.key}) {
     for (Match match in FirebaseApi.pastMatches) {
       for (var prediction in match.predictions.entries) {
-        if (match.hasPredicted(prediction.key)) {
-          if (match.hasPerfectWin(prediction.key)) {
-            playerRanking
-                .firstWhere((player) => player.name == prediction.key)
-                .score += 3;
-          } else if (match.hasWin(prediction.key)) {
-            playerRanking
-                .firstWhere((player) => player.name == prediction.key)
-                .score += 1;
+        if (match.bo == 1) {
+          if (match.hasPredicted(prediction.key)) {
+            if (match.hasWin(prediction.key)) {
+              playerRanking
+                  .firstWhere((player) => player.name == prediction.key)
+                  .score += 1;
+            }
           }
-        }
+        } else if (match.bo == 3) {
+          if (match.hasPredicted(prediction.key)) {
+            if (match.hasPerfectWin(prediction.key)) {
+              playerRanking
+                  .firstWhere((player) => player.name == prediction.key)
+                  .score += 2;
+            } else if (match.hasWin(prediction.key)) {
+              playerRanking
+                  .firstWhere((player) => player.name == prediction.key)
+                  .score += 1;
+            }
+          }
+        } else if (match.bo == 5) {
+          if (match.hasPredicted(prediction.key)) {
+            if (match.hasPerfectWin(prediction.key)) {
+              playerRanking
+                  .firstWhere((player) => player.name == prediction.key)
+                  .score += 3;
+            } else if (match.hasWin(prediction.key)) {
+              playerRanking
+                  .firstWhere((player) => player.name == prediction.key)
+                  .score += 1;
+            }
+          }
+        } else {}
       }
     }
     playerRanking
