@@ -63,6 +63,10 @@ class Match {
         predictions[user].toString()[1] == score[1];
   }
 
+  String toStringFromUserPrediction(String user) {
+    return '${team1.name} ${predictions[user].toString()[0]} - ${predictions[user].toString()[1]} ${team2.name}';
+  }
+
   @override
   String toString() {
     return '${team1.name} ${score[0]} - ${score[1]} ${team2.name}';

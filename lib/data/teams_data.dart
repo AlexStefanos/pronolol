@@ -59,6 +59,6 @@ const Map<String, String> teamsLogo = {
       'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/a/a1/GIANTXlogo_square.png/revision/latest/scale-to-width-down/123?cb=20231214160222',
   'KC':
       'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/2/2d/Karmine_Corplogo_square.png/revision/latest/scale-to-width-down/123?cb=20221019054047',
-  'RGEX':
-      'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/a/a4/Rogue_%28European_Team%29logo_square.png/revision/latest/scale-to-width-down/123?cb=20231125191715'
+  'RGE':
+      'https://upload.wikimedia.org/wikipedia/en/thumb/a/af/Rogue_logo.svg/220px-Rogue_logo.svg.png'
 };

@@ -8,13 +8,13 @@ class PlayerItem extends StatelessWidget {
 
   const PlayerItem(this.player, this.rank, {super.key});
 
-  MaterialColor getPlayerColor() {
+  Color getPlayerColor() {
     if (rank == 0) {
-      return (Colors.green);
+      return (const Color.fromARGB(172, 49, 189, 84));
     } else if (rank == 5) {
-      return (Colors.red);
+      return (const Color.fromARGB(146, 173, 0, 0));
     } else {
-      return (Colors.grey);
+      return (const Color.fromARGB(120, 96, 125, 139));
     }
   }
 

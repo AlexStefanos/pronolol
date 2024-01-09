@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pronolol/api/firebase.dart';
-import 'package:pronolol/data/teams_data.dart';
 import 'package:pronolol/models/match_model.dart';
 import 'package:pronolol/models/team_model.dart';
 import 'package:pronolol/models/user_model.dart';
@@ -59,7 +58,7 @@ class _BetModalState extends State<BetModal> {
                 ),
                 child: Column(children: [
                   Image.network(
-                    teamsLogo[widget.match.team1.name]!,
+                    FirebaseApi.logos[widget.match.team1.name]!,
                     height: 50,
                     width: 50,
                     alignment: Alignment.centerLeft,
@@ -87,7 +86,7 @@ class _BetModalState extends State<BetModal> {
                 ),
                 child: Column(children: [
                   Image.network(
-                    teamsLogo[widget.match.team2.name]!,
+                    FirebaseApi.logos[widget.match.team2.name]!,
                     height: 50,
                     width: 50,
                     alignment: Alignment.centerLeft,

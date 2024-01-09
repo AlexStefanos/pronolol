@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pronolol/data/teams_data.dart';
+import 'package:pronolol/api/firebase.dart';
 import 'package:pronolol/modals/bet_modal.dart';
 import 'package:pronolol/models/match_model.dart';
 import 'package:pronolol/models/user_model.dart';
@@ -23,28 +23,30 @@ class _MatchItemState extends State<MatchItem> {
           return BetModal(widget.match);
         });
     setState(() {
-      widget.match.predictions[User.name ?? ''] = value;
+      if (value != null) {
+        widget.match.predictions[User.name ?? ''] = value;
+      }
     });
   }
 
-  MaterialColor getMatchColor() {
+  Color getMatchColor() {
     if (!widget.match.isFutureMatch()) {
       if (widget.match.hasPredicted(User.name ?? '')) {
         if (widget.match.hasPerfectWin(User.name ?? '')) {
-          return Colors.amber;
+          return const Color(0xFFEBB22F);
         } else if (widget.match.hasWin(User.name ?? '')) {
-          return Colors.green;
+          return const Color(0xFF31BD55);
         } else {
-          return Colors.red;
+          return const Color(0xFFEB4829);
         }
       } else {
-        return Colors.grey;
+        return const Color.fromARGB(120, 96, 125, 139);
       }
     } else {
       if (widget.match.canPredict(User.name ?? '')) {
-        return Colors.teal;
+        return const Color(0xFF318CE7);
       } else {
-        return Colors.grey;
+        return const Color.fromARGB(120, 96, 125, 139);
       }
     }
   }
@@ -66,14 +68,17 @@ class _MatchItemState extends State<MatchItem> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Image.network(
-                teamsLogo[widget.match.team1.name]!,
+                FirebaseApi.logos[widget.match.team1.name]!,
                 height: 50,
                 width: 50,
                 alignment: Alignment.centerLeft,
               ),
-              Text(widget.match.toString()),
+              widget.match.hasPredicted(User.name ?? '')
+                  ? Text(
+                      widget.match.toStringFromUserPrediction(User.name ?? ''))
+                  : Text(widget.match.toString()),
               Image.network(
-                teamsLogo[widget.match.team2.name]!,
+                FirebaseApi.logos[widget.match.team2.name]!,
                 height: 50,
                 width: 50,
                 alignment: Alignment.centerLeft,

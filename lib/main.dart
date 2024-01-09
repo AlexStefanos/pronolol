@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:pronolol/api/firebase.dart';
@@ -14,6 +15,7 @@ void main() async {
   );
   await FirebaseApi.initNotifications();
   await User.getUser();
+  await FirebaseApi.getLogos();
   initializeDateFormatting('fr_FR');
   runApp(const PronololApp());
 }
@@ -23,9 +25,14 @@ class PronololApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: HomePage(),
+      themeMode: ThemeMode.dark,
     );
   }
 }

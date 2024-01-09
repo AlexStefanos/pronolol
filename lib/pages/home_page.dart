@@ -97,8 +97,9 @@ class _HomePageState extends State<HomePage> {
           ),
         ]),
         floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.white,
           child: Text(
-            Emoji('index pointing at the viewer', '🫵').code,
+            Emoji('bar_chart', '📊').code,
             style: const TextStyle(fontSize: 40),
           ),
           onPressed: () {

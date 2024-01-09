@@ -12,13 +12,12 @@ class FirebaseApi {
   static final _firebaseMessaging = FirebaseMessaging.instance;
   static final _firebaseFirestore = FirebaseFirestore.instance;
 
-  static List<Match> sortedNeedingBetMatchesByDateDesc = [];
-  static List<Match> sortedMatchesByDateDesc = [];
   static List<Match> futureMatches = [];
   static List<Match> pastMatches = [];
   static List<Match> predictedMatches = [];
   static List<Match> playerPredictions = [];
   static List<Player> playersRanking = [];
+  static Map<String, dynamic> logos = {};
 
   static Future<void> initNotifications() async {
     await _firebaseMessaging.requestPermission();
@@ -70,5 +69,11 @@ class FirebaseApi {
     await _firebaseFirestore.collection(pronololPath).doc(id).set({
       'predictions': {User.name: score}
     }, SetOptions(merge: true));
+  }
+
+  static Future<void> getLogos() async {
+    logos =
+        (await _firebaseFirestore.collection('pronolol_data').doc('logo').get())
+            .data()!;
   }
 }
