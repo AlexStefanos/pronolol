@@ -3,13 +3,12 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:pronolol/data/players_data.dart';
 import 'package:pronolol/models/match_model.dart';
 import 'package:pronolol/models/player_model.dart';
 import 'package:pronolol/models/user_model.dart';
 
 class FirebaseApi {
-  static const pronololPath = 'test';
+  static const pronololPath = 'pronolol';
   static final _firebaseMessaging = FirebaseMessaging.instance;
   static final _firebaseFirestore = FirebaseFirestore.instance;
 
@@ -19,7 +18,7 @@ class FirebaseApi {
   static List<Match> pastMatches = [];
   static List<Match> predictedMatches = [];
   static List<Match> playerPredictions = [];
-  static List<Player> playersRanking = getPlayersRanking();
+  static List<Player> playersRanking = [];
 
   static Future<void> initNotifications() async {
     await _firebaseMessaging.requestPermission();
@@ -57,14 +56,9 @@ class FirebaseApi {
 
   static Future<void> getPredictedMatches() async {
     try {
-      final docRefs = await _firebaseFirestore
-          .collection(pronololPath)
-          .where('predictions')
-          .orderBy('date', descending: true)
-          .get();
-
+      List<Match> tmp = pastMatches + futureMatches;
       playerPredictions =
-          docRefs.docs.map((e) => Match.fromFirebase(e.id, e.data())).toList();
+          tmp.where((e) => e.predictions.containsKey(User.name)).toList();
     } catch (e) {
       log(e.toString());
     }
@@ -74,11 +68,5 @@ class FirebaseApi {
     await _firebaseFirestore.collection(pronololPath).doc(id).set({
       'predictions': {User.name: score}
     }, SetOptions(merge: true));
-  }
-
-  static List<Player> getPlayersRanking() {
-    List<Player> result = playersData.keys.toList();
-    result.sort(((player1, player2) => player1.rank.compareTo(player2.rank)));
-    return result;
   }
 }

@@ -4,13 +4,14 @@ import 'package:pronolol/models/player_model.dart';
 
 class PlayerItem extends StatelessWidget {
   final Player player;
+  final int rank;
 
-  const PlayerItem(this.player, {super.key});
+  const PlayerItem(this.player, this.rank, {super.key});
 
   MaterialColor getPlayerColor() {
-    if (player.rank == 1) {
+    if (rank == 0) {
       return (Colors.green);
-    } else if (player.rank == 6) {
+    } else if (rank == 5) {
       return (Colors.red);
     } else {
       return (Colors.grey);
@@ -28,11 +29,11 @@ class PlayerItem extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                '${player.name} ${playersData[player]!}',
+                '${player.name} ${playersData[player.name]!}',
                 style: const TextStyle(fontSize: 17),
               ),
               const SizedBox(height: 5),
-              Text('${player.score} (${player.rank}/6)'),
+              Text('${player.score} ($rank/6)'),
             ],
           ),
         ),

@@ -1,6 +1,5 @@
 import 'package:pronolol/models/team_model.dart';
 import 'package:intl/intl.dart';
-import 'package:pronolol/models/user_model.dart';
 
 final formatter = DateFormat('dd/M/y');
 
@@ -39,24 +38,24 @@ class Match {
     }
   }
 
-  bool canPredict() {
-    return isFutureMatch() && predictions[User.name] == null;
+  bool canPredict(String user) {
+    return isFutureMatch() && predictions[user] == null;
   }
 
-  bool hasPredicted() {
-    return predictions[User.name] != null;
+  bool hasPredicted(String user) {
+    return predictions[user] != null;
   }
 
-  bool hasWin() {
+  bool hasWin(String user) {
     return (score.codeUnitAt(0) > score.codeUnitAt(1) &&
-            predictions[User.name].toString()[0] == score[0]) ||
+            predictions[user].toString()[0] == score[0]) ||
         (score.codeUnitAt(0) < score.codeUnitAt(1) &&
-            predictions[User.name].toString()[1] == score[1]);
+            predictions[user].toString()[1] == score[1]);
   }
 
-  bool hasPerfectWin() {
-    return predictions[User.name].toString()[0] == score[0] &&
-        predictions[User.name].toString()[1] == score[1];
+  bool hasPerfectWin(String user) {
+    return predictions[user].toString()[0] == score[0] &&
+        predictions[user].toString()[1] == score[1];
   }
 
   @override

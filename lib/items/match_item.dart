@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pronolol/data/teams_data.dart';
 import 'package:pronolol/modals/bet_modal.dart';
 import 'package:pronolol/models/match_model.dart';
+import 'package:pronolol/models/user_model.dart';
 
 class MatchItem extends StatelessWidget {
   final Match match;
@@ -20,10 +21,10 @@ class MatchItem extends StatelessWidget {
 
   MaterialColor getMatchColor() {
     if (!match.isFutureMatch()) {
-      if (match.hasPredicted()) {
-        if (match.hasPerfectWin()) {
+      if (match.hasPredicted(User.name ?? '')) {
+        if (match.hasPerfectWin(User.name ?? '')) {
           return Colors.amber;
-        } else if (match.hasWin()) {
+        } else if (match.hasWin(User.name ?? '')) {
           return Colors.green;
         } else {
           return Colors.red;
@@ -32,7 +33,7 @@ class MatchItem extends StatelessWidget {
         return Colors.grey;
       }
     } else {
-      if (match.canPredict()) {
+      if (match.canPredict(User.name ?? '')) {
         return Colors.teal;
       } else {
         return Colors.grey;
@@ -43,10 +44,11 @@ class MatchItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => (((match.isFutureMatch()) && (!match.canPredict())) ||
-              !match.isFutureMatch())
-          ? openMatchPage()
-          : showBetModal(context),
+      onTap: () =>
+          (((match.isFutureMatch()) && (!match.canPredict(User.name ?? ''))) ||
+                  !match.isFutureMatch())
+              ? openMatchPage()
+              : showBetModal(context),
       child: Card(
         color: getMatchColor(),
         child: Padding(

@@ -88,11 +88,8 @@ class _HomePageState extends State<HomePage> {
             style: const TextStyle(fontSize: 40),
           ),
           onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        PredictionsPage(User.name.toString())));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ResultsPage()));
           },
         ),
       ),
