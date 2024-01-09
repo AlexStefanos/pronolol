@@ -71,9 +71,9 @@ class _HomePageState extends State<HomePage> {
             builder: (ctx, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 return ListView.builder(
-                  itemCount: FirebaseApi.pastOrPredictedMatches.length,
+                  itemCount: FirebaseApi.pastMatches.length,
                   itemBuilder: (ctx, i) =>
-                      MatchItem(FirebaseApi.pastOrPredictedMatches[i]),
+                      MatchItem(FirebaseApi.pastMatches[i]),
                 );
               } else {
                 return const Center(child: CircularProgressIndicator());

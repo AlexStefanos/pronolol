@@ -16,8 +16,8 @@ class FirebaseApi {
   static List<Match> sortedNeedingBetMatchesByDateDesc = [];
   static List<Match> sortedMatchesByDateDesc = [];
   static List<Match> futureMatches = [];
-  static List<Match> pastOrPredictedMatches = [];
-  static List<Match> playerPredictions = [];
+  static List<Match> pastMatches = [];
+  static List<Match> predictedMatches = [];
   static List<Player> playersRanking = getPlayersRanking();
 
   static Future<void> initNotifications() async {
@@ -47,7 +47,22 @@ class FirebaseApi {
           .orderBy('date', descending: true)
           .get();
 
-      pastOrPredictedMatches =
+      pastMatches =
+          docRefs.docs.map((e) => Match.fromFirebase(e.id, e.data())).toList();
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  static Future<void> getPredictedMatches() async {
+    try {
+      final docRefs = await _firebaseFirestore
+          .collection(pronololPath)
+          .where('predictions')
+          .orderBy('date', descending: true)
+          .get();
+
+      List<Match> tmp =
           docRefs.docs.map((e) => Match.fromFirebase(e.id, e.data())).toList();
     } catch (e) {
       log(e.toString());
@@ -58,21 +73,6 @@ class FirebaseApi {
     await _firebaseFirestore.collection(pronololPath).doc(id).set({
       'predictions': {User.name: score}
     }, SetOptions(merge: true));
-  }
-
-  static Future<void> getPlayersPredictions(String username) async {
-    try {
-      final docRefs = await _firebaseFirestore
-          .collection(pronololPath)
-          .where('predictions')
-          .orderBy('date', descending: true)
-          .get();
-
-      playerPredictions =
-          docRefs.docs.map((e) => Match.fromFirebase(e.id, e.data())).toList();
-    } catch (e) {
-      log(e.toString());
-    }
   }
 
   static List<Player> getPlayersRanking() {

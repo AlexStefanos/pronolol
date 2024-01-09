@@ -37,15 +37,15 @@ class _PredictionsPageState extends State<PredictionsPage> {
             builder: (ctx, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 return ListView.builder(
-                  itemCount: FirebaseApi.playerPredictions.length,
+                  itemCount: FirebaseApi.predictedMatches.length,
                   itemBuilder: (ctx, i) =>
-                      MatchItem(FirebaseApi.playerPredictions[i]),
+                      MatchItem(FirebaseApi.predictedMatches[i]),
                 );
               } else {
                 return const Center(child: CircularProgressIndicator());
               }
             },
-            future: FirebaseApi.getPlayersPredictions(widget.username),
+            future: FirebaseApi.getPredictedMatches(),
           ),
           FutureBuilder(
             builder: (ctx, snapshot) {

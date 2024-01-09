@@ -10,7 +10,7 @@ class Player {
   int calculateTotalScore() {
     int totalScore = 0;
     //for()
-    for (Match match in FirebaseApi.playerPredictions) {
+    for (Match match in FirebaseApi.pastMatches) {
       if (match.bo == 1) {
         if (match.hasPredicted()) {
           if (match.hasPerfectWin()) {
