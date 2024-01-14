@@ -33,11 +33,11 @@ class _MatchItemState extends State<MatchItem> {
     if (!widget.match.isFutureMatch()) {
       if (widget.match.hasPredicted(User.name ?? '')) {
         if (widget.match.hasPerfectWin(User.name ?? '')) {
-          return const Color(0xFFEBB22F);
-        } else if (widget.match.hasWin(User.name ?? '')) {
           return const Color(0xFF31BD55);
+        } else if (widget.match.hasWin(User.name ?? '')) {
+          return const Color(0xFFEBB22F);
         } else {
-          return const Color(0xFFEB4829);
+          return const Color.fromARGB(146, 173, 0, 0);
         }
       } else {
         return const Color.fromARGB(120, 96, 125, 139);

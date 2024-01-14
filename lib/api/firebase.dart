@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:pronolol/models/match_model.dart';
-import 'package:pronolol/models/player_model.dart';
 import 'package:pronolol/models/user_model.dart';
 
 class FirebaseApi {
@@ -16,7 +15,6 @@ class FirebaseApi {
   static List<Match> pastMatches = [];
   static List<Match> predictedMatches = [];
   static List<Match> playerPredictions = [];
-  static List<Player> playersRanking = [];
   static Map<String, dynamic> logos = {};
 
   static Future<void> initNotifications() async {
