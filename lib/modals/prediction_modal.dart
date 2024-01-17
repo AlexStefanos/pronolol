@@ -1,19 +1,20 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:pronolol/api/firebase.dart';
+import 'package:pronolol/api/postgres.dart';
 import 'package:pronolol/models/match_model.dart';
 import 'package:pronolol/models/team_model.dart';
-import 'package:pronolol/models/user_model.dart';
 
-class BetModal extends StatefulWidget {
+class PredictionModal extends StatefulWidget {
   final Match match;
 
-  const BetModal(this.match, {super.key});
+  const PredictionModal(this.match, {super.key});
 
   @override
-  State<BetModal> createState() => _BetModalState();
+  State<PredictionModal> createState() => _PredictionModalState();
 }
 
-class _BetModalState extends State<BetModal> {
+class _PredictionModalState extends State<PredictionModal> {
   int? bet1 = 0;
   int? bet2 = 0;
   Team? winner;
@@ -44,6 +45,7 @@ class _BetModalState extends State<BetModal> {
             GestureDetector(
               onTap: () => setState(() {
                 winner = widget.match.team1;
+                bet2 = bet1;
                 bet1 = (widget.match.bo / 2).ceil();
               }),
               child: Container(
@@ -58,7 +60,7 @@ class _BetModalState extends State<BetModal> {
                 ),
                 child: Column(children: [
                   Image.network(
-                    FirebaseApi.logos[widget.match.team1.name]!,
+                    widget.match.team1.logo,
                     height: 50,
                     width: 50,
                     alignment: Alignment.centerLeft,
@@ -71,6 +73,7 @@ class _BetModalState extends State<BetModal> {
               onTap: () {
                 setState(() {
                   winner = widget.match.team2;
+                  bet1 = bet2;
                   bet2 = (widget.match.bo / 2).ceil();
                 });
               },
@@ -86,7 +89,7 @@ class _BetModalState extends State<BetModal> {
                 ),
                 child: Column(children: [
                   Image.network(
-                    FirebaseApi.logos[widget.match.team2.name]!,
+                    widget.match.team2.logo,
                     height: 50,
                     width: 50,
                     alignment: Alignment.centerLeft,
@@ -122,8 +125,9 @@ class _BetModalState extends State<BetModal> {
           ]),
           IconButton(
               onPressed: () async {
-                await FirebaseApi.predict(widget.match.id, '$bet1$bet2');
-                widget.match.predictions[User.name ?? ''] = '$bet1$bet2';
+                log('$bet1$bet2');
+                await PostgresApi.addPrediction(widget.match.id, '$bet1$bet2');
+                widget.match.currentUserPrediction = '$bet1$bet2';
                 Navigator.pop(context, '$bet1$bet2');
               },
               icon: const Icon(Icons.check))

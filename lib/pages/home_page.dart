@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_emoji/flutter_emoji.dart';
-import 'package:pronolol/api/firebase.dart';
+import 'package:pronolol/api/postgres.dart';
 import 'package:pronolol/items/match_item.dart';
 import 'package:pronolol/models/user_model.dart';
-import 'package:pronolol/pages/results_page.dart';
+import 'package:pronolol/pages/ranking_page.dart';
+import 'package:pronolol/utils/colors.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,97 +14,71 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (User.name == null) {
-        User.showSelectUserModal(context);
-        setState(() {});
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('pronolol'),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: FilledButton(
-                  onPressed: () async {
-                    await User.showSelectUserModal(context);
-                    setState(() {});
-                  },
-                  child: Text(User.name ?? '')),
-            )
-          ],
-          bottom: const TabBar(tabs: [
-            Tab(
-              text: 'À venir',
-            ),
-            Tab(
-              text: 'Passés',
-            )
-          ]),
-        ),
+            title: const Text('pronolol'),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(User.currentUser!.emoji),
+              )
+            ],
+            bottom: TabBar(
+                tabs: const [Tab(text: 'À venir'), Tab(text: 'Passés')],
+                labelColor: appColors['FUTURE'],
+                indicatorColor: appColors['FUTURE'])),
         body: TabBarView(children: [
           FutureBuilder(
             builder: (ctx, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.connectionState == ConnectionState.done &&
+                  snapshot.hasData) {
                 return ListView.builder(
-                    itemCount: FirebaseApi.futureMatches.length,
+                    itemCount: snapshot.data?.length,
                     itemBuilder: (ctx, i) => i == 0 ||
-                            FirebaseApi.futureMatches[i].date.day !=
-                                FirebaseApi.futureMatches[i - 1].date.day
+                            snapshot.data?[i].date.day !=
+                                snapshot.data?[i - 1].date.day
                         ? Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                                 Center(
-                                  child: Text(
-                                      FirebaseApi
-                                          .futureMatches[i].literatureDate,
-                                      style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold)),
-                                ),
-                                MatchItem(FirebaseApi.futureMatches[i])
+                                    child: Text(
+                                        snapshot.data![i].literatureDate,
+                                        style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold))),
+                                MatchItem(snapshot.data![i])
                               ])
-                        : MatchItem(FirebaseApi.futureMatches[i]));
+                        : MatchItem(snapshot.data![i]));
               } else {
                 return const Center(child: CircularProgressIndicator());
               }
             },
-            future: FirebaseApi.getFutureMatches(),
+            future: PostgresApi.getMatchesToCome(),
           ),
           FutureBuilder(
             builder: (ctx, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.connectionState == ConnectionState.done &&
+                  snapshot.hasData) {
                 return ListView.builder(
-                  itemCount: FirebaseApi.pastMatches.length,
-                  itemBuilder: (ctx, i) =>
-                      MatchItem(FirebaseApi.pastMatches[i]),
+                  itemCount: snapshot.data?.length,
+                  itemBuilder: (ctx, i) => MatchItem(snapshot.data![i]),
                 );
               } else {
                 return const Center(child: CircularProgressIndicator());
               }
             },
-            future: FirebaseApi.getPastMatches(),
+            future: PostgresApi.getPastMatches(),
           ),
         ]),
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.white,
-          child: Text(
-            Emoji('bar_chart', '📊').code,
-            style: const TextStyle(fontSize: 40),
-          ),
+          child: const Text('🏆', style: TextStyle(fontSize: 40)),
           onPressed: () {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ResultsPage()));
+                MaterialPageRoute(builder: (context) => const RankingPage()));
           },
         ),
       ),

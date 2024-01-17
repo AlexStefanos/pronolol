@@ -1,8 +1,10 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'package:pronolol/api/firebase.dart';
-import 'package:pronolol/modals/bet_modal.dart';
+import 'package:pronolol/api/postgres.dart';
+import 'package:pronolol/modals/prediction_modal.dart';
 import 'package:pronolol/models/match_model.dart';
-import 'package:pronolol/models/user_model.dart';
+import 'package:pronolol/utils/colors.dart';
 
 class MatchItem extends StatefulWidget {
   final Match match;
@@ -14,77 +16,151 @@ class MatchItem extends StatefulWidget {
 }
 
 class _MatchItemState extends State<MatchItem> {
-  void openMatchPage() {}
+  var _isOpen = false;
 
   void showBetModal(BuildContext ctx) async {
     var value = await showDialog(
         context: ctx,
         builder: (BuildContext context) {
-          return BetModal(widget.match);
+          return PredictionModal(widget.match);
         });
     setState(() {
       if (value != null) {
-        widget.match.predictions[User.name ?? ''] = value;
+        widget.match.currentUserPrediction = value;
       }
     });
-  }
-
-  Color getMatchColor() {
-    if (!widget.match.isFutureMatch()) {
-      if (widget.match.hasPredicted(User.name ?? '')) {
-        if (widget.match.hasPerfectWin(User.name ?? '')) {
-          return const Color(0xFF31BD55);
-        } else if (widget.match.hasWin(User.name ?? '')) {
-          return const Color(0xFFEBB22F);
-        } else {
-          return const Color.fromARGB(146, 173, 0, 0);
-        }
-      } else {
-        return const Color.fromARGB(120, 96, 125, 139);
-      }
-    } else {
-      if (widget.match.canPredict(User.name ?? '')) {
-        return const Color(0xFF318CE7);
-      } else {
-        return const Color.fromARGB(120, 96, 125, 139);
-      }
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => (((widget.match.isFutureMatch()) &&
-                  (!widget.match.canPredict(User.name ?? ''))) ||
-              !widget.match.isFutureMatch())
-          ? openMatchPage()
-          : showBetModal(context),
+      onTap: () {
+        if (widget.match.canCurrentUserPredict) {
+          showBetModal(context);
+        } else {
+          setState(() {
+            _isOpen = !_isOpen;
+          });
+        }
+      },
       child: Card(
-        color: getMatchColor(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.network(
-                FirebaseApi.logos[widget.match.team1.name]!,
-                height: 50,
-                width: 50,
-                alignment: Alignment.centerLeft,
+        color: widget.match.isFutureMatch
+            ? widget.match.currentUserHasPredicted
+                ? appColors['PREDICTED']
+                : appColors['FUTURE']
+            : appColors['PAST'],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 30),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.network(
+                    widget.match.team1.logo,
+                    width: 50,
+                    alignment: Alignment.center,
+                  ),
+                  Text(
+                    widget.match.team1.name.padLeft(3),
+                    style: const TextStyle(
+                      fontFamily: "monospace",
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (widget.match.score != null) ...[
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Card(
+                          elevation: 5,
+                          color: Colors.white,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              '${widget.match.score![0]} - ${widget.match.score![1]}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontFamily: "monospace",
+                                fontWeight: FontWeight.bold,
+                                color: widget.match.isCurrentUserWinner
+                                    ? appColors['WIN']
+                                    : appColors['LOSE'],
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (widget.match.isCurrentUserPerfectWinner) ...[
+                          Positioned(
+                            left: 18,
+                            top: -22,
+                            child: Image.network(
+                              'https://i.pinimg.com/originals/39/1a/96/391a964218aa5d42228201804286641c.png',
+                              alignment: Alignment.center,
+                              height: 25,
+                            ),
+                          ),
+                        ]
+                      ],
+                    )
+                  ],
+                  Text(
+                    widget.match.team2.name.padRight(3),
+                    style: const TextStyle(
+                      fontFamily: "monospace",
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Image.network(
+                    widget.match.team2.logo,
+                    width: 50,
+                    alignment: Alignment.center,
+                  ),
+                ],
               ),
-              widget.match.hasPredicted(User.name ?? '')
-                  ? Text(
-                      widget.match.toStringFromUserPrediction(User.name ?? ''))
-                  : Text(widget.match.toString()),
-              Image.network(
-                FirebaseApi.logos[widget.match.team2.name]!,
-                height: 50,
-                width: 50,
-                alignment: Alignment.centerLeft,
-              ),
-            ],
-          ),
+            ),
+            Visibility(
+                visible: _isOpen,
+                child: FutureBuilder(
+                  future: PostgresApi.getMatchPredictionsById(widget.match.id),
+                  builder: (ctx, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done &&
+                        snapshot.hasData) {
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(15, 0, 15, 18),
+                        child: Column(
+                          children: [
+                            for (var prediction in snapshot.data!)
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '${prediction.result == widget.match.score ? '✅' : widget.match.score != null ? '❌' : ''} ${prediction.user.name} ${prediction.user.emoji}',
+                                    style: const TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    '${prediction.result[0]} - ${prediction.result[1]}',
+                                    style: const TextStyle(fontSize: 17),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  },
+                ))
+          ],
         ),
       ),
     );

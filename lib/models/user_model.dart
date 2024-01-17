@@ -1,45 +1,43 @@
-import 'package:flutter/material.dart';
+import 'package:pronolol/api/postgres.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class User {
-  static const List<String> users = [
-    'Alex',
-    'Quentin',
-    'Kazou',
-    'Caribou',
-    'Pully',
-    'Nathan'
-  ];
-  static String? name;
+  User(this.id, this.name, this.emoji);
 
-  // Get user from shared preferences
-  static Future<void> getUser() async {
+  final int id;
+  final String name;
+  final String emoji;
+
+  static User? currentUser;
+
+  static User fromPostgres(Map<String, dynamic> data) {
+    return User(data['id'], data['username'], data['emoji']);
+  }
+
+  static Future<void> fetchUser() async {
     SharedPreferences instance = await SharedPreferences.getInstance();
-    name = instance.getString('user');
+    String? id = instance.getString('id');
+    if (id != null) {
+      User.currentUser = await PostgresApi.getUserById(id);
+    }
   }
 
-  // Save user in shared preferences
-  static Future<void> saveUser(String user) async {
+  static Future<void> saveUser(String id) async {
     SharedPreferences instance = await SharedPreferences.getInstance();
-    await instance.setString('user', user);
-    name = user;
+    await instance.setString('id', id);
+    User.currentUser = await PostgresApi.getUserById(id);
   }
 
-  static Future<void> showSelectUserModal(BuildContext context) async {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: users
-                .map((user) => FilledButton(
-                    onPressed: () => User.saveUser(user)
-                        .then((value) => Navigator.pop(context)),
-                    child: Text(user)))
-                .toList());
-      },
-    );
+  @override
+  String toString() {
+    return 'User{id: $id, name: $name, emoji: $emoji}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is User && runtimeType == other.runtimeType && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
