@@ -4,6 +4,7 @@ import 'package:pronolol/items/match_item.dart';
 import 'package:pronolol/models/user_model.dart';
 import 'package:pronolol/pages/ranking_page.dart';
 import 'package:pronolol/utils/colors.dart';
+import 'package:restart_app/restart_app.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,10 +22,14 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
             title: const Text('pronolol'),
             actions: [
+              IconButton(
+                onPressed: () => Restart.restartApp(),
+                icon: const Icon(Icons.refresh),
+              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(User.currentUser!.emoji),
-              )
+              ),
             ],
             bottom: TabBar(
                 tabs: const [Tab(text: 'À venir'), Tab(text: 'Passés')],
