@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:pronolol/api/postgres.dart';
 import 'package:pronolol/modals/prediction_modal.dart';

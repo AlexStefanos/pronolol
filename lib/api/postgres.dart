@@ -37,7 +37,7 @@ class PostgresApi {
         LEFT JOIN teams t1 on m.team1 = t1.id
         LEFT JOIN teams t2 on m.team2 = t2.id
         LEFT JOIN predictions p on m.id = p.match_id AND p.user_id = ${User.currentUser!.id}
-        WHERE m.date >= NOW() AND date < NOW() + INTERVAL '7 days'
+        WHERE m.date >= NOW() AND date < NOW() + INTERVAL '10 days'
         ORDER BY m.date;
         ''');
     return result.map((e) => Match.fromPostgres(e.toColumnMap())).toList();
@@ -79,13 +79,48 @@ class PostgresApi {
     }).toList();
   }
 
-  static Future<List<MapEntry<User, int>>> getRanking() async {
+  static Future<List<MapEntry<User, int>>> getGlobalRanking() async {
     final result = await execute('''
         SELECT u.id, u.username, u.emoji, p.result, m.score, m.bo
         FROM users u
         INNER JOIN predictions p on u.id = p.user_id
         INNER JOIN matches m on p.match_id = m.id
         WHERE m.date < NOW();
+        ''');
+
+    Map<User, int> ranking = {};
+
+    for (var row in result) {
+      var map = row.toColumnMap();
+      User user = User.fromPostgres(map);
+      if (ranking[user] == null) {
+        ranking[user] = 0;
+      }
+      if (map['result'] == map['score']) {
+        int bo = map['bo'];
+        ranking[user] = ranking[user]! + (bo / 2).floor();
+      }
+      if ((map['score'].toString().codeUnits[0] >
+                  map['score'].toString().codeUnits[1] &&
+              map['result'].toString().codeUnits[0] ==
+                  map['score'].toString().codeUnits[0]) ||
+          (map['score'].toString().codeUnits[0] <
+                  map['score'].toString().codeUnits[1] &&
+              map['result'].toString().codeUnits[1] ==
+                  map['score'].toString().codeUnits[1])) {
+        ranking[user] = ranking[user]! + 1;
+      }
+    }
+    return ranking.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+  }
+
+  static Future<List<MapEntry<User, int>>> getCurrentRanking() async {
+    final result = await execute('''
+        SELECT u.id, u.username, u.emoji, p.result, m.score, m.bo
+        FROM users u
+        INNER JOIN predictions p on u.id = p.user_id
+        INNER JOIN matches m on p.match_id = m.id
+        WHERE m.date > '2024-03-01 12:00:00';
         ''');
 
     Map<User, int> ranking = {};

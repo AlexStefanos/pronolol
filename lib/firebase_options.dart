@@ -27,10 +27,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -76,5 +73,13 @@ class DefaultFirebaseOptions {
     projectId: 'bot-discord-397ae',
     storageBucket: 'bot-discord-397ae.appspot.com',
     iosBundleId: 'com.example.pronolol.RunnerTests',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyA2kG7LE0vIuGkfZsLx6eOmBe_aOM605a8',
+    appId: '1:729772678052:android:3203302229597d3691ff31',
+    messagingSenderId: '729772678052',
+    projectId: 'bot-discord-397ae',
+    storageBucket: 'bot-discord-397ae.appspot.com',
   );
 }
