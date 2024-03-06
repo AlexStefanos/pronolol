@@ -22,10 +22,20 @@ class User {
     }
   }
 
-  static Future<void> saveUser(String id) async {
+  static Future<void> saveUserId(String id) async {
     SharedPreferences instance = await SharedPreferences.getInstance();
     await instance.setString('id', id);
     User.currentUser = await PostgresApi.getUserById(id);
+  }
+
+  static Future<void> saveUserPin(List<String> pin) async {
+    var pinFinal = '';
+    for (var elem in pin) {
+      pinFinal += elem;
+    }
+    SharedPreferences instance = await SharedPreferences.getInstance();
+    await instance.setString('pin', pinFinal);
+    User.currentUser = await PostgresApi.getUserByPin(pinFinal);
   }
 
   @override

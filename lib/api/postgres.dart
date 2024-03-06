@@ -23,6 +23,11 @@ class PostgresApi {
     return User.fromPostgres(result.first.toColumnMap());
   }
 
+  static Future<User> getUserByPin(String pin) async {
+    final result = await execute('SELECT * FROM users WHERE pin = $pin;');
+    return User.fromPostgres(result.first.toColumnMap());
+  }
+
   static Future<List<String>> getUsers() async {
     final result = await execute('SELECT username FROM users;');
     return result.map((e) {

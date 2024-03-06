@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:pronolol/api/postgres.dart';
 import 'package:pronolol/models/match_model.dart';
@@ -110,6 +108,7 @@ class _PredictionModalState extends State<PredictionModal> {
               dropdownMenuEntries: generateBoList(widget.match.team1),
               onSelected: (value) => setState(() {
                 bet1 = value;
+                bet2 = 0;
               }),
             ),
             DropdownMenu<int>(
@@ -120,15 +119,17 @@ class _PredictionModalState extends State<PredictionModal> {
               dropdownMenuEntries: generateBoList(widget.match.team2),
               onSelected: (value) => setState(() {
                 bet2 = value;
+                bet1 = 0;
               }),
             )
           ]),
           IconButton(
               onPressed: () async {
-                log('$bet1$bet2');
                 await PostgresApi.addPrediction(widget.match.id, '$bet1$bet2');
                 widget.match.currentUserPrediction = '$bet1$bet2';
-                Navigator.pop(context, '$bet1$bet2');
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
               },
               icon: const Icon(Icons.check))
         ]

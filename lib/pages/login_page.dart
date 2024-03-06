@@ -112,11 +112,13 @@ class _LoginPageState extends State<LoginPage> {
                               pin[3] = value;
                             }
                             if (!pin.contains('')) {
-                              await User.saveUser(pin[2]);
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const HomePage()));
+                              await User.saveUserPin(pin);
+                              if (context.mounted) {
+                                Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const HomePage()));
+                              }
                               setState(() {});
                             }
                           },
@@ -136,11 +138,11 @@ class _LoginPageState extends State<LoginPage> {
             IconButton.filled(
                 onPressed: () async {
                   if (!pin.contains('')) {
-                    await User.saveUser(pin[2]);
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomePage()));
+                    await User.saveUserPin(pin);
+                    if (context.mounted) {
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => const HomePage()));
+                    }
                   }
                 },
                 icon: const Icon(Icons.check))

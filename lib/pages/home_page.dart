@@ -14,6 +14,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  void _disconnection() {
+    User.currentUser = null;
+    Restart.restartApp();
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -23,8 +28,8 @@ class _HomePageState extends State<HomePage> {
             title: const Text('pronolol'),
             actions: [
               IconButton(
-                onPressed: () => Restart.restartApp(),
-                icon: const Icon(Icons.refresh),
+                onPressed: _disconnection,
+                icon: const Icon(Icons.login),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -36,46 +41,60 @@ class _HomePageState extends State<HomePage> {
                 labelColor: appColors['FUTURE'],
                 indicatorColor: appColors['FUTURE'])),
         body: TabBarView(children: [
-          FutureBuilder(
-            builder: (ctx, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done &&
-                  snapshot.hasData) {
-                return ListView.builder(
-                    itemCount: snapshot.data?.length,
-                    itemBuilder: (ctx, i) => i == 0 ||
-                            snapshot.data?[i].date.day !=
-                                snapshot.data?[i - 1].date.day
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                                Center(
-                                    child: Text(
-                                        snapshot.data![i].literatureDate,
-                                        style: const TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold))),
-                                MatchItem(snapshot.data![i])
-                              ])
-                        : MatchItem(snapshot.data![i]));
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
+          RefreshIndicator(
+            child: FutureBuilder(
+              builder: (ctx, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  return ListView.builder(
+                      itemCount: snapshot.data?.length,
+                      itemBuilder: (ctx, i) => i == 0 ||
+                              snapshot.data?[i].date.day !=
+                                  snapshot.data?[i - 1].date.day
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                  Center(
+                                      child: Text(
+                                          snapshot.data![i].literatureDate,
+                                          style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold))),
+                                  MatchItem(snapshot.data![i])
+                                ])
+                          : MatchItem(snapshot.data![i]));
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+              future: PostgresApi.getMatchesToCome(),
+            ),
+            onRefresh: () {
+              return Future(() {
+                setState(() {});
+              });
             },
-            future: PostgresApi.getMatchesToCome(),
           ),
-          FutureBuilder(
-            builder: (ctx, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done &&
-                  snapshot.hasData) {
-                return ListView.builder(
-                  itemCount: snapshot.data?.length,
-                  itemBuilder: (ctx, i) => MatchItem(snapshot.data![i]),
-                );
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
+          RefreshIndicator(
+            child: FutureBuilder(
+              builder: (ctx, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    snapshot.hasData) {
+                  return ListView.builder(
+                    itemCount: snapshot.data?.length,
+                    itemBuilder: (ctx, i) => MatchItem(snapshot.data![i]),
+                  );
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+              future: PostgresApi.getPastMatches(),
+            ),
+            onRefresh: () {
+              return Future(() {
+                setState(() {});
+              });
             },
-            future: PostgresApi.getPastMatches(),
           ),
         ]),
         floatingActionButton: FloatingActionButton(
