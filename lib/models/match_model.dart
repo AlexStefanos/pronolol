@@ -32,10 +32,6 @@ class Match {
     return currentUserPrediction != null;
   }
 
-  bool get canCurrentUserPredict {
-    return isFutureMatch && !currentUserHasPredicted;
-  }
-
   bool get isCurrentUserWinner {
     return currentUserPrediction != null &&
         ((score!.codeUnitAt(0) > score!.codeUnitAt(1) &&

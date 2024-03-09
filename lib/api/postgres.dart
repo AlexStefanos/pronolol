@@ -68,6 +68,13 @@ class PostgresApi {
         ''');
   }
 
+  static Future<void> removePrediction(int matchId) async {
+    await execute('''
+        DELETE FROM predictions
+        WHERE match_id = $matchId AND user_id = ${User.currentUser!.id}
+        ''');
+  }
+
   static Future<List<(Match, String)>> getUserPredictions() async {
     final result = await execute('''
         SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, m.score, p.result

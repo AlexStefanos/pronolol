@@ -6,13 +6,15 @@ class RankingItem extends StatelessWidget {
   final User user;
   final num score;
   final int rank;
+  final int nbPlayers;
 
-  const RankingItem(this.user, this.score, this.rank, {super.key});
+  const RankingItem(this.user, this.score, this.nbPlayers, this.rank,
+      {super.key});
 
   Color? getRankColor() {
     if (rank == 1) {
       return appColors['WIN'];
-    } else if (rank == 6) {
+    } else if (rank == nbPlayers) {
       return appColors['LOSE'];
     } else {
       return appColors['PREDICTED'];

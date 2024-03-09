@@ -25,21 +25,22 @@ class _HomePageState extends State<HomePage> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-            title: const Text('pronolol'),
-            actions: [
-              IconButton(
-                onPressed: _disconnection,
-                icon: const Icon(Icons.login),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(User.currentUser!.emoji),
-              ),
-            ],
-            bottom: TabBar(
-                tabs: const [Tab(text: 'À venir'), Tab(text: 'Passés')],
-                labelColor: appColors['FUTURE'],
-                indicatorColor: appColors['FUTURE'])),
+          title: const Text('pronolol'),
+          actions: [
+            IconButton(
+              onPressed: _disconnection,
+              icon: const Icon(Icons.login),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(User.currentUser!.emoji),
+            ),
+          ],
+          bottom: TabBar(
+              tabs: const [Tab(text: 'À venir'), Tab(text: 'Passés')],
+              labelColor: appColors['FUTURE'],
+              indicatorColor: appColors['FUTURE']),
+        ),
         body: TabBarView(children: [
           RefreshIndicator(
             child: FutureBuilder(
@@ -55,11 +56,13 @@ class _HomePageState extends State<HomePage> {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                   Center(
-                                      child: Text(
-                                          snapshot.data![i].literatureDate,
-                                          style: const TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold))),
+                                    child: Text(
+                                      snapshot.data![i].literatureDate,
+                                      style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
                                   MatchItem(snapshot.data![i])
                                 ])
                           : MatchItem(snapshot.data![i]));
@@ -81,7 +84,7 @@ class _HomePageState extends State<HomePage> {
                 if (snapshot.connectionState == ConnectionState.done &&
                     snapshot.hasData) {
                   return ListView.builder(
-                    itemCount: snapshot.data?.length,
+                    itemCount: 59,
                     itemBuilder: (ctx, i) => MatchItem(snapshot.data![i]),
                   );
                 } else {

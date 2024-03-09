@@ -33,7 +33,8 @@ class _MatchItemState extends State<MatchItem> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (widget.match.canCurrentUserPredict) {
+        if (widget.match.isFutureMatch &&
+            !widget.match.currentUserHasPredicted) {
           showBetModal(context);
         } else {
           setState(() {
@@ -50,6 +51,24 @@ class _MatchItemState extends State<MatchItem> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Row(
+              children: [
+                const Expanded(child: SizedBox(width: 1)),
+                if (widget.match.currentUserHasPredicted &&
+                    widget.match.isFutureMatch) ...[
+                  IconButton(
+                    onPressed: () {
+                      if (widget.match.isFutureMatch &&
+                          widget.match.currentUserHasPredicted) {
+                        showBetModal(context);
+                      }
+                    },
+                    icon: const Icon(Icons.edit_square),
+                    iconSize: 30.0,
+                  )
+                ],
+              ],
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 30),
               child: Row(
@@ -123,41 +142,41 @@ class _MatchItemState extends State<MatchItem> {
               ),
             ),
             Visibility(
-                visible: _isOpen,
-                child: FutureBuilder(
-                  future: PostgresApi.getMatchPredictionsById(widget.match.id),
-                  builder: (ctx, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done &&
-                        snapshot.hasData) {
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(15, 0, 15, 18),
-                        child: Column(
-                          children: [
-                            for (var prediction in snapshot.data!)
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    '${prediction.result == widget.match.score ? '✅' : widget.match.score != null ? '❌' : ''} ${prediction.user.name} ${prediction.user.emoji}',
-                                    style: const TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    '${prediction.result[0]} - ${prediction.result[1]}',
-                                    style: const TextStyle(fontSize: 17),
-                                  ),
-                                ],
-                              ),
-                          ],
-                        ),
-                      );
-                    } else {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                  },
-                ))
+              visible: _isOpen,
+              child: FutureBuilder(
+                future: PostgresApi.getMatchPredictionsById(widget.match.id),
+                builder: (ctx, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasData) {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 0, 15, 18),
+                      child: Column(
+                        children: [
+                          for (var prediction in snapshot.data!)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '${prediction.result == widget.match.score ? '✅' : widget.match.score != null ? '❌' : ''} ${prediction.user.name} ${prediction.user.emoji}',
+                                  style: const TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  '${prediction.result[0]} - ${prediction.result[1]}',
+                                  style: const TextStyle(fontSize: 17),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
+            ),
           ],
         ),
       ),

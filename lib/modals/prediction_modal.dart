@@ -36,6 +36,9 @@ class _PredictionModalState extends State<PredictionModal> {
             child: Padding(
       padding: const EdgeInsets.all(10),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
+        if (widget.match.currentUserHasPredicted) ...[
+          const Text('BAH ALORS TU DOUTES ???'),
+        ],
         Text('BO: ${widget.match.bo} Date: ${widget.match.numericalDate}'),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -125,6 +128,10 @@ class _PredictionModalState extends State<PredictionModal> {
           ]),
           IconButton(
               onPressed: () async {
+                if (widget.match.currentUserHasPredicted) {
+                  widget.match.currentUserPrediction = '';
+                  await PostgresApi.removePrediction(widget.match.id);
+                }
                 await PostgresApi.addPrediction(widget.match.id, '$bet1$bet2');
                 widget.match.currentUserPrediction = '$bet1$bet2';
                 if (context.mounted) {
