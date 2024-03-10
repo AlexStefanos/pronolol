@@ -68,9 +68,9 @@ class PostgresApi {
         ''');
   }
 
-  static Future<void> removePrediction(int matchId) async {
+  static Future<void> updatePrediction(int matchId, String result) async {
     await execute('''
-        DELETE FROM predictions
+        UPDATE predictions SET result = '$result'
         WHERE match_id = $matchId AND user_id = ${User.currentUser!.id}
         ''');
   }

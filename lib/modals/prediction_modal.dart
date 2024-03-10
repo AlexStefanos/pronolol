@@ -129,11 +129,14 @@ class _PredictionModalState extends State<PredictionModal> {
           IconButton(
               onPressed: () async {
                 if (widget.match.currentUserHasPredicted) {
-                  widget.match.currentUserPrediction = '';
-                  await PostgresApi.removePrediction(widget.match.id);
+                  await PostgresApi.updatePrediction(
+                      widget.match.id, '$bet1$bet2');
+                  widget.match.currentUserPrediction = '$bet1$bet2';
+                } else {
+                  await PostgresApi.addPrediction(
+                      widget.match.id, '$bet1$bet2');
+                  widget.match.currentUserPrediction = '$bet1$bet2';
                 }
-                await PostgresApi.addPrediction(widget.match.id, '$bet1$bet2');
-                widget.match.currentUserPrediction = '$bet1$bet2';
                 if (context.mounted) {
                   Navigator.of(context).pop();
                 }
