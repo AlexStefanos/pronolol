@@ -3,6 +3,7 @@ import 'package:pronolol/api/postgres.dart';
 import 'package:pronolol/items/ranking_item.dart';
 import 'package:pronolol/models/user_model.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RankingPage extends StatefulWidget {
   const RankingPage({super.key});
@@ -12,8 +13,10 @@ class RankingPage extends StatefulWidget {
 }
 
 class _RankingPageState extends State<RankingPage> {
-  void _disconnection() {
+  void _disconnection() async {
     User.currentUser = null;
+    SharedPreferences instance = await SharedPreferences.getInstance();
+    instance.clear();
     Restart.restartApp();
   }
 
@@ -37,7 +40,7 @@ class _RankingPageState extends State<RankingPage> {
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Split Actuel'),
-              Tab(text: 'Splits Précédents (Moyenne S1 : 40,5 points)')
+              Tab(text: 'Splits Précédents') //Moyenne S1 : 40,5 points
             ],
           ),
         ),

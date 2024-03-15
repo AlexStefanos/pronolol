@@ -87,5 +87,5 @@ for event in events:
                 print('final')
                 cur.execute('INSERT INTO matches (date, team1, score, team2, bo) VALUES (%s, (SELECT id FROM teams t WHERE t.tricode = %s), %s, (SELECT id FROM teams t WHERE t.tricode = %s), %s)', (date, team1, score, team2, bo))
                 conn.commit()
-    cur.execute('INSERT INTO scrapping_history (last_scrapped) VALUEs (%s)', datetime.now())
+    cur.execute('INSERT INTO scrapping_history (last_scrapped) VALUES (%s)', datetime.now())
 driver.quit()

@@ -28,14 +28,11 @@ class User {
     User.currentUser = await PostgresApi.getUserById(id);
   }
 
-  static Future<void> saveUserPin(List<String> pin) async {
-    var pinFinal = '';
-    for (var elem in pin) {
-      pinFinal += elem;
-    }
+  static Future<void> saveUserPin(String pin) async {
+    User.currentUser = await PostgresApi.getUserByPin(pin);
+    String id = User.currentUser!.id.toString();
     SharedPreferences instance = await SharedPreferences.getInstance();
-    await instance.setString('pin', pinFinal);
-    User.currentUser = await PostgresApi.getUserByPin(pinFinal);
+    await instance.setString('id', id);
   }
 
   @override

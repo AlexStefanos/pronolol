@@ -5,6 +5,7 @@ import 'package:pronolol/models/user_model.dart';
 import 'package:pronolol/pages/ranking_page.dart';
 import 'package:pronolol/utils/colors.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,8 +15,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  void _disconnection() {
+  void _disconnection() async {
     User.currentUser = null;
+    SharedPreferences instance = await SharedPreferences.getInstance();
+    instance.clear();
     Restart.restartApp();
   }
 

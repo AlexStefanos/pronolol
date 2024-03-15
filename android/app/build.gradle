@@ -59,6 +59,12 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    applicationVariants.all {
+        variant -> variant.outputs.all {
+            outputFileName = "pronolol_release_0.9.apk"
+        }
+    }
 }
 
 flutter {

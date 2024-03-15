@@ -23,8 +23,8 @@ class PostgresApi {
     return User.fromPostgres(result.first.toColumnMap());
   }
 
-  static Future<User> getUserByPin(String pin) async {
-    final result = await execute('SELECT * FROM users WHERE pin = $pin;');
+  static Future<User> getUserByPin(String cpin) async {
+    final result = await execute('SELECT * FROM users WHERE cpin = \'$cpin\';');
     return User.fromPostgres(result.first.toColumnMap());
   }
 
@@ -132,7 +132,7 @@ class PostgresApi {
         FROM users u
         INNER JOIN predictions p on u.id = p.user_id
         INNER JOIN matches m on p.match_id = m.id
-        WHERE m.date > '2024-03-01 12:00:00';
+        WHERE m.date > (SELECT start_date FROM current_split WHERE id=(SELECT MAX(id) FROM current_split));
         ''');
 
     Map<User, int> ranking = {};
