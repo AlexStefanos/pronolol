@@ -111,7 +111,6 @@ class _PredictionModalState extends State<PredictionModal> {
               dropdownMenuEntries: generateBoList(widget.match.team1),
               onSelected: (value) => setState(() {
                 bet1 = value;
-                bet2 = 0;
               }),
             ),
             DropdownMenu<int>(
@@ -122,7 +121,6 @@ class _PredictionModalState extends State<PredictionModal> {
               dropdownMenuEntries: generateBoList(widget.match.team2),
               onSelected: (value) => setState(() {
                 bet2 = value;
-                bet1 = 0;
               }),
             )
           ]),

@@ -62,6 +62,7 @@ class PostgresApi {
   }
 
   static Future<void> addPrediction(int matchId, String score) async {
+    print(score);
     await execute('''
         INSERT INTO predictions (match_id, user_id, result)
         VALUES ($matchId, ${User.currentUser!.id}, '$score')
