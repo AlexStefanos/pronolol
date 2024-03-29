@@ -62,7 +62,6 @@ class PostgresApi {
   }
 
   static Future<void> addPrediction(int matchId, String score) async {
-    print(score);
     await execute('''
         INSERT INTO predictions (match_id, user_id, result)
         VALUES ($matchId, ${User.currentUser!.id}, '$score')
@@ -170,5 +169,12 @@ class PostgresApi {
         WHERE p.match_id = $id;
         ''');
     return result.map((e) => Prediction.fromPostgres(e.toColumnMap())).toList();
+  }
+
+  static Future<String> getCurrentSplit() async {
+    final result = await execute('''
+    SELECT description FROM current_split WHERE id=(SELECT MAX(id) FROM current_split)
+    ''');
+    return result[0][0].toString();
   }
 }

@@ -39,8 +39,8 @@ class _RankingPageState extends State<RankingPage> {
           ],
           bottom: const TabBar(
             tabs: [
-              Tab(text: 'Split Actuel'),
-              Tab(text: 'Splits Précédents') //Moyenne S1 : 40,5 points
+              Tab(text: 'Score du Split Actuel'),
+              Tab(text: 'Score Total')
             ],
           ),
         ),

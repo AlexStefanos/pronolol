@@ -55,37 +55,43 @@ def to_date(value):
 
 utc = pytz.utc
 cursorDate = conn.cursor()
-select_query = 'select last_scrapped from scrapping_history where id=(select max(id) from scrapping_history)'
-cursorDate.execute(select_query)
-date_last_scrapped = cursorDate.fetchall()
-cleaned_date = datetime.strptime(format(date_last_scrapped[0][0], '%d/%m/%y %H:%M:%S'), '%d/%m/%y %H:%M:%S')
+cursorDate.execute('SELECT DISTINCT ON (date) * FROM matches ORDER BY date DESC LIMIT 1')
+date_last_match = cursorDate.fetchall()
+cleaned_date = datetime.strptime(format(date_last_match[0][3], '%d/%m/%y %H:%M:%S'), '%d/%m/%y %H:%M:%S')
+date_today = datetime.now()
+date_localized = datetime.now()
 
 for event in events:
-    date_localized = datetime.now()
-    #Get element class name
+    cur = conn.cursor()
     if event.get_attribute('class') == 'EventDate':
         monthday = event.find_element(By.CLASS_NAME, 'monthday').text
-        date = to_date(monthday)
-        date_localized = utc.localize(date)
+        if monthday != '29 février':
+            date = to_date(monthday)
+            date_localized = utc.localize(date)
     elif event.get_attribute('class') == 'EventMatch':
-        if date_localized > cleaned_date:
-            if len(event.find_elements(By.CLASS_NAME, 'live')) > 0:
-                continue
-            hour = event.find_element(By.CLASS_NAME, 'hour').text
-            minute = event.find_element(By.CLASS_NAME, 'minute').text
-            date_localized = date_localized.replace(hour=int(hour), minute=int(minute))
-            team1 = event.find_element(By.CLASS_NAME, 'team1').find_element(By.CLASS_NAME, 'tricode').text
-            team2 = event.find_element(By.CLASS_NAME, 'team2').find_element(By.CLASS_NAME, 'tricode').text
-            league = event.find_element(By.CLASS_NAME, 'league').find_element(By.CLASS_NAME, 'name').text
-            bo = int(event.find_element(By.CLASS_NAME, 'strategy').text[-1])
-            score = None
-            if len(event.find_elements(By.CLASS_NAME, 'score')) > 0:
-                score = event.find_element(By.CLASS_NAME, 'scoreTeam1').text + event.find_element(By.CLASS_NAME, 'scoreTeam2').text
-            naive_date_localized = datetime.replace(date_localized, tzinfo=None)
-            cur = conn.cursor()
-            if naive_date_localized > cleaned_date:
-                print('final')
-                cur.execute('INSERT INTO matches (date, team1, score, team2, bo) VALUES (%s, (SELECT id FROM teams t WHERE t.tricode = %s), %s, (SELECT id FROM teams t WHERE t.tricode = %s), %s)', (date, team1, score, team2, bo))
+        if len(event.find_elements(By.CLASS_NAME, 'live')) > 0:
+            continue
+        hour = event.find_element(By.CLASS_NAME, 'hour').text
+        minute = event.find_element(By.CLASS_NAME, 'minute').text
+        date_replaced = date_localized.replace(hour=int(hour), minute=int(minute))
+        date_final = date_replaced.strftime('%Y-%m-%d %H:%M:%S')
+        team1 = event.find_element(By.CLASS_NAME, 'team1').find_element(By.CLASS_NAME, 'tricode').text
+        team2 = event.find_element(By.CLASS_NAME, 'team2').find_element(By.CLASS_NAME, 'tricode').text
+        league = event.find_element(By.CLASS_NAME, 'league').find_element(By.CLASS_NAME, 'name').text
+        bo = int(event.find_element(By.CLASS_NAME, 'strategy').text[-1])
+        score = None
+        if len(event.find_elements(By.CLASS_NAME, 'score')) > 0:
+            score = event.find_element(By.CLASS_NAME, 'scoreTeam1').text + event.find_element(By.CLASS_NAME, 'scoreTeam2').text
+        naive_date_localized = datetime.replace(date_localized, tzinfo=None)
+        if date_today > cleaned_date:
+            print('Inserted')
+            cur.execute('INSERT INTO matches (id, date, team1, score, team2, bo) VALUES ((select max(id) from matches) + 1, %s, (SELECT id FROM teams t WHERE t.tricode = %s), %s, (SELECT id FROM teams t WHERE t.tricode = %s), %s)', (date_final, team1, score, team2, bo))
+            conn.commit()
+        else:
+            cur.execute('SELECT * FROM matches WHERE (date=\'' + date_final + '\')')
+            match_date = cur.fetchall()
+            if match_date and match_date[0][5] is None:
+                print('Updated')
+                cur.execute('UPDATE matches SET score=%s WHERE (date=\'' + date_final + '\')', score)
                 conn.commit()
-    cur.execute('INSERT INTO scrapping_history (last_scrapped) VALUES (%s)', datetime.now())
 driver.quit()

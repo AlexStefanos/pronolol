@@ -7,6 +7,7 @@ class Match {
 
   final _numericalFormat = DateFormat('dd/MM/y HH:mm', 'fr_FR');
   final _literatureFormat = DateFormat('EEEE dd MMMM', 'fr_FR');
+  final _numericalSchedule = DateFormat('HH:mm', 'fr_FR');
 
   final int id;
   final Team team1;
@@ -21,7 +22,11 @@ class Match {
   }
 
   String get literatureDate {
-    return _literatureFormat.format(date).toUpperCase();
+    return toBeginningOfSentenceCase(_literatureFormat.format(date));
+  }
+
+  String get numericalSchedule {
+    return _numericalSchedule.format(date);
   }
 
   bool get isFutureMatch {

@@ -36,9 +36,6 @@ class _PredictionModalState extends State<PredictionModal> {
             child: Padding(
       padding: const EdgeInsets.all(10),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        if (widget.match.currentUserHasPredicted) ...[
-          const Text('BAH ALORS TU DOUTES ???'),
-        ],
         Text('BO: ${widget.match.bo} Date: ${widget.match.numericalDate}'),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -70,6 +67,7 @@ class _PredictionModalState extends State<PredictionModal> {
                 ]),
               ),
             ),
+            const Text('-'),
             GestureDetector(
               onTap: () {
                 setState(() {
@@ -101,6 +99,10 @@ class _PredictionModalState extends State<PredictionModal> {
             ),
           ],
         ),
+        if (widget.match.currentUserHasPredicted) ...[
+          const Text('BAH ALORS TU DOUTES ???'),
+          const SizedBox(height: 15),
+        ],
         if (winner != null) ...[
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             DropdownMenu<int>(
@@ -139,7 +141,7 @@ class _PredictionModalState extends State<PredictionModal> {
                   Navigator.of(context).pop();
                 }
               },
-              icon: const Icon(Icons.check))
+              icon: const Icon(Icons.check)),
         ]
       ]),
     )));

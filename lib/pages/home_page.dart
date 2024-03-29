@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pronolol/api/postgres.dart';
 import 'package:pronolol/items/match_item.dart';
+import 'package:pronolol/modals/side_drawer_modal.dart';
 import 'package:pronolol/models/user_model.dart';
 import 'package:pronolol/pages/ranking_page.dart';
 import 'package:pronolol/utils/colors.dart';
@@ -15,6 +16,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  var currentSplit = '';
+
   void _disconnection() async {
     User.currentUser = null;
     SharedPreferences instance = await SharedPreferences.getInstance();
@@ -23,16 +26,27 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await PostgresApi.getCurrentSplit().then((value) => setState(() {
+            currentSplit = value;
+          }));
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
+        drawer: const SideDrawer(),
         appBar: AppBar(
           title: const Text('pronolol'),
           actions: [
             IconButton(
               onPressed: _disconnection,
-              icon: const Icon(Icons.login),
+              icon: const Icon(Icons.exit_to_app),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -40,7 +54,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
           bottom: TabBar(
-              tabs: const [Tab(text: 'À venir'), Tab(text: 'Passés')],
+              tabs: const [Tab(text: 'À Venir'), Tab(text: 'Passés')],
               labelColor: appColors['FUTURE'],
               indicatorColor: appColors['FUTURE']),
         ),
@@ -66,9 +80,11 @@ class _HomePageState extends State<HomePage> {
                                           fontWeight: FontWeight.bold),
                                     ),
                                   ),
-                                  MatchItem(snapshot.data![i])
+                                  MatchItem(snapshot.data![i], 'à Venir',
+                                      currentSplit)
                                 ])
-                          : MatchItem(snapshot.data![i]));
+                          : MatchItem(
+                              snapshot.data![i], 'à Venir', currentSplit));
                 } else {
                   return const Center(child: CircularProgressIndicator());
                 }
@@ -88,7 +104,8 @@ class _HomePageState extends State<HomePage> {
                     snapshot.hasData) {
                   return ListView.builder(
                     itemCount: 59,
-                    itemBuilder: (ctx, i) => MatchItem(snapshot.data![i]),
+                    itemBuilder: (ctx, i) =>
+                        MatchItem(snapshot.data![i], 'passés', currentSplit),
                   );
                 } else {
                   return const Center(child: CircularProgressIndicator());

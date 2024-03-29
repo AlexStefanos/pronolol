@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:pronolol/api/postgres.dart';
+import 'package:pronolol/modals/players_predictions_modal.dart';
 import 'package:pronolol/modals/prediction_modal.dart';
 import 'package:pronolol/models/match_model.dart';
 import 'package:pronolol/utils/colors.dart';
 
 class MatchItem extends StatefulWidget {
   final Match match;
+  final String pageKey, currentSplit;
 
-  const MatchItem(this.match, {super.key});
+  const MatchItem(this.match, this.pageKey, this.currentSplit, {super.key});
 
   @override
   State<MatchItem> createState() => _MatchItemState();
@@ -29,12 +31,19 @@ class _MatchItemState extends State<MatchItem> {
     });
   }
 
+  void showPlayersPredictions(BuildContext ctx) {
+    showDialog(
+        context: ctx,
+        builder: (BuildContext context) {
+          return PlayersPredictionsModal(widget.match);
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (widget.match.isFutureMatch &&
-            !widget.match.currentUserHasPredicted) {
+        if (widget.match.isFutureMatch) {
           showBetModal(context);
         } else {
           setState(() {
@@ -53,19 +62,28 @@ class _MatchItemState extends State<MatchItem> {
           children: [
             Row(
               children: [
-                const Expanded(child: SizedBox(width: 1)),
-                if (widget.match.currentUserHasPredicted &&
-                    widget.match.isFutureMatch) ...[
+                if (widget.match.isFutureMatch) ...[
+                  const SizedBox(width: 15),
+                  Text(
+                    '${widget.currentSplit}, BO : ${widget.match.bo}, ${widget.match.numericalSchedule}',
+                    style: const TextStyle(
+                        fontSize: 17, fontStyle: FontStyle.italic),
+                  ),
+                  const Expanded(child: SizedBox(width: 1)),
                   IconButton(
                     onPressed: () {
-                      if (widget.match.isFutureMatch &&
-                          widget.match.currentUserHasPredicted) {
-                        showBetModal(context);
-                      }
+                      showPlayersPredictions(context);
                     },
-                    icon: const Icon(Icons.edit_square),
+                    icon: const Icon(Icons.assignment),
                     iconSize: 30.0,
                   )
+                ] else ...[
+                  const SizedBox(width: 15, height: 40),
+                  Text(
+                    '${widget.currentSplit}, ${widget.match.literatureDate}, ${widget.match.numericalSchedule}',
+                    style: const TextStyle(
+                        fontSize: 17, fontStyle: FontStyle.italic),
+                  ),
                 ],
               ],
             ),
@@ -83,11 +101,10 @@ class _MatchItemState extends State<MatchItem> {
                   Text(
                     widget.match.team1.name.padLeft(3),
                     style: const TextStyle(
-                      fontFamily: "monospace",
                       fontSize: 20,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const Text('-'),
                   if (widget.match.score != null) ...[
                     Stack(
                       clipBehavior: Clip.none,
@@ -102,7 +119,6 @@ class _MatchItemState extends State<MatchItem> {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 20,
-                                fontFamily: "monospace",
                                 fontWeight: FontWeight.bold,
                                 color: widget.match.isCurrentUserWinner
                                     ? appColors['WIN']
@@ -128,9 +144,7 @@ class _MatchItemState extends State<MatchItem> {
                   Text(
                     widget.match.team2.name.padRight(3),
                     style: const TextStyle(
-                      fontFamily: "monospace",
                       fontSize: 20,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   Image.network(
@@ -141,42 +155,45 @@ class _MatchItemState extends State<MatchItem> {
                 ],
               ),
             ),
-            Visibility(
-              visible: _isOpen,
-              child: FutureBuilder(
-                future: PostgresApi.getMatchPredictionsById(widget.match.id),
-                builder: (ctx, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done &&
-                      snapshot.hasData) {
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(15, 0, 15, 18),
-                      child: Column(
-                        children: [
-                          for (var prediction in snapshot.data!)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  '${prediction.result == widget.match.score ? '✅' : widget.match.score != null ? '❌' : ''} ${prediction.user.name} ${prediction.user.emoji}',
-                                  style: const TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  '${prediction.result[0]} - ${prediction.result[1]}',
-                                  style: const TextStyle(fontSize: 17),
-                                ),
-                              ],
-                            ),
-                        ],
-                      ),
-                    );
-                  } else {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                },
-              ),
-            ),
+            if (widget.pageKey == 'passés') ...[
+              Visibility(
+                visible: _isOpen,
+                child: FutureBuilder(
+                  future: PostgresApi.getMatchPredictionsById(widget.match.id),
+                  builder: (ctx, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done &&
+                        snapshot.hasData) {
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(15, 0, 15, 18),
+                        child: Column(
+                          children: [
+                            for (var prediction in snapshot.data!)
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    '${prediction.result == widget.match.score ? '✅' : widget.match.score != null ? '❌' : ''} ${prediction.user.name} ${prediction.user.emoji}',
+                                    style: const TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    '${prediction.result[0]} - ${prediction.result[1]}',
+                                    style: const TextStyle(fontSize: 17),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  },
+                ),
+              )
+            ],
           ],
         ),
       ),
