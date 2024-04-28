@@ -2,8 +2,11 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
+import 'package:pronolol/api/postgres.dart';
+import 'package:pronolol/modals/inscription_modal.dart';
 import 'package:pronolol/models/user_model.dart';
 import 'package:pronolol/pages/home_page.dart';
+import 'package:pronolol/utils/tournaments.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,6 +17,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   var pin = ['', '', '', ''];
+  String userEmoji = '';
   FocusNode focusNode1 = FocusNode();
   FocusNode focusNode2 = FocusNode();
   FocusNode focusNode3 = FocusNode();
@@ -26,14 +30,18 @@ class _LoginPageState extends State<LoginPage> {
     SystemChannels.textInput.invokeMethod("TextInput.show");
   }*/
 
-  String encryptPassword(List<String> password) {
-    var pinFinal = '';
-    for (var elem in password) {
-      pinFinal += elem;
-    }
-    final bytes = utf8.encode(pinFinal);
+  String encryptPassword(String password) {
+    final bytes = utf8.encode(password);
     final hash = sha256.convert(bytes);
     return hash.toString();
+  }
+
+  String pinToString(List<String> pin) {
+    var pinFinal = '';
+    for (var elem in pin) {
+      pinFinal += elem;
+    }
+    return pinFinal;
   }
 
   @override
@@ -137,17 +145,32 @@ class _LoginPageState extends State<LoginPage> {
                               pin[3] = value;
                             }
                             if (!pin.contains('')) {
-                              await User.saveUserPin(encryptPassword(pin));
-                              if (User.currentUser != null) {
+                              if (PostgresApi.doesUserExists(
+                                          encryptPassword(pinToString(pin)))
+                                      .then((value) => value) ==
+                                  Future<bool>.value(true)) {
+                                await User.saveUserPin(
+                                    encryptPassword(pinToString(pin)));
                                 if (context.mounted) {
                                   Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              const HomePage()));
+                                          builder: (context) => const HomePage(
+                                              Tournaments.global)));
                                 }
-                                setState(() {});
                               } else {
-                                //Create account
+                                PostgresApi.createUser(
+                                    encryptPassword(pinToString(pin)));
+                                await showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return InscriptionModal(pinToString(pin));
+                                    });
+                                if (context.mounted) {
+                                  Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                          builder: (context) => const HomePage(
+                                              Tournaments.global)));
+                                }
                               }
                             }
                           },
@@ -165,16 +188,34 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             IconButton.filled(
-                onPressed: () async {
-                  if (!pin.contains('')) {
-                    await User.saveUserPin(encryptPassword(pin));
+              onPressed: () async {
+                if (!pin.contains('')) {
+                  if (PostgresApi.doesUserExists(
+                          encryptPassword(pinToString(pin))) ==
+                      Future<bool>.value(true)) {
+                    await User.saveUserPin(encryptPassword(pinToString(pin)));
                     if (context.mounted) {
                       Navigator.of(context).pushReplacement(MaterialPageRoute(
-                          builder: (context) => const HomePage()));
+                          builder: (context) =>
+                              const HomePage(Tournaments.global)));
+                    }
+                  } else {
+                    PostgresApi.createUser(encryptPassword(pinToString(pin)));
+                    await showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return InscriptionModal(pinToString(pin));
+                        });
+                    if (context.mounted) {
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) =>
+                              const HomePage(Tournaments.global)));
                     }
                   }
-                },
-                icon: const Icon(Icons.check))
+                }
+              },
+              icon: const Icon(Icons.check),
+            )
           ],
         ));
   }

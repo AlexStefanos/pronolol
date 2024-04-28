@@ -1,7 +1,11 @@
 import 'package:postgres/postgres.dart';
+import 'package:pronolol/models/champion_model.dart';
 import 'package:pronolol/models/match_model.dart';
+import 'package:pronolol/models/pickem_model.dart';
 import 'package:pronolol/models/prediction_model.dart';
+import 'package:pronolol/models/tournament_model.dart';
 import 'package:pronolol/models/user_model.dart';
+import 'package:pronolol/utils/tournaments.dart';
 
 class PostgresApi {
   static Future<Result> execute(String query) async {
@@ -23,9 +27,14 @@ class PostgresApi {
     return User.fromPostgres(result.first.toColumnMap());
   }
 
-  static Future<User> getUserByPin(String cpin) async {
+  static Future<User?> getUserByPin(String cpin) async {
     final result = await execute('SELECT * FROM users WHERE cpin = \'$cpin\';');
-    return User.fromPostgres(result.first.toColumnMap());
+    if (result.firstOrNull == null) {
+      createUser(cpin);
+    } else {
+      return User.fromPostgres(result.first.toColumnMap());
+    }
+    return null;
   }
 
   static Future<List<String>> getUsers() async {
@@ -35,12 +44,66 @@ class PostgresApi {
     }).toList();
   }
 
+  static Future<void> createUser(String cpin) async {
+    final result = await execute(
+        'INSERT INTO users (id, cpin) VALUES ((SELECT MAX(id)+1 FROM users), \'$cpin\');');
+  }
+
+  static Future<void> updateUser(String cpin, String userName) async {
+    final result = await execute(
+        'UPDATE users SET username = \'$userName\' WHERE cpin = \'$cpin\';');
+  }
+
+  static Future<bool> doesUserExists(String cpin) async {
+    final result = await execute('SELECT 1 FROM users WHERE cpin = \'$cpin\';');
+    if (result.isEmpty) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  static Tournaments getTournamentsName(Object? e) {
+    for (var value in Tournaments.values) {
+      if (value.name == e.toString()) {
+        return (value);
+      }
+    }
+    return Tournaments.msi;
+  }
+
+  static Future<List<Champion>> getChampions() async {
+    final result = await execute('SELECT * FROM champions ORDER BY name;');
+    return result.map((e) {
+      return Champion(e[1].toString(), e[2].toString());
+    }).toList();
+  }
+
+  static Future<List<Pickem>> getPickemsQuestions(
+      Tournaments tournament) async {
+    final result = await execute('SELECT * FROM pickems ORDER BY id;');
+    return result.map((e) {
+      return Pickem(
+          int.parse(e[0].toString()),
+          e[1].toString(),
+          int.parse(e[3].toString()),
+          Tournament(
+              tournament,
+              'https://static.wikia.nocookie.net/lolesports_gamepedia_en/images/9/97/Mid-Season_Invitational_2019.png/revision/latest?cb=20230512021227',
+              DateTime.parse('2024-05-01 08:00:00.000000 +00:00')),
+          List.empty(),
+          '',
+          '');
+    }).toList();
+  }
+
   static Future<List<Match>> getMatchesToCome() async {
     final result = await execute('''
-        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, p.result
+        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, tourn.tricode as tourn_tricode, p.result
         FROM matches m
         LEFT JOIN teams t1 on m.team1 = t1.id
         LEFT JOIN teams t2 on m.team2 = t2.id
+        LEFT JOIN tournaments tourn on m.tournament = tourn.tricode
         LEFT JOIN predictions p on m.id = p.match_id AND p.user_id = ${User.currentUser!.id}
         WHERE m.date >= NOW() AND date < NOW() + INTERVAL '10 days'
         ORDER BY m.date;
@@ -48,14 +111,43 @@ class PostgresApi {
     return result.map((e) => Match.fromPostgres(e.toColumnMap())).toList();
   }
 
-  static Future<List<Match>> getPastMatches() async {
+  static Future<List<Match>> getSpecificMatchesToCome(String tournament) async {
     final result = await execute('''
-        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, m.score, p.result
+        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, tourn.tricode, p.result
         FROM matches m
         LEFT JOIN teams t1 on m.team1 = t1.id
         LEFT JOIN teams t2 on m.team2 = t2.id
+        LEFT JOIN tournaments tourn on m.tournament = tourn.tricode
+        LEFT JOIN predictions p on m.id = p.match_id AND p.user_id = ${User.currentUser!.id}
+        WHERE m.tournament = '$tournament' AND m.date >= NOW() AND date < NOW() + INTERVAL '10 days'
+        ORDER BY m.date;
+        ''');
+    return result.map((e) => Match.fromPostgres(e.toColumnMap())).toList();
+  }
+
+  static Future<List<Match>> getPastMatches() async {
+    final result = await execute('''
+        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, m.score, tourn.tricode, p.result
+        FROM matches m
+        LEFT JOIN teams t1 on m.team1 = t1.id
+        LEFT JOIN teams t2 on m.team2 = t2.id
+        LEFT JOIN tournaments tourn on m.tournament = tourn.tricode
         LEFT JOIN predictions p on m.id = p.match_id AND p.user_id = ${User.currentUser!.id}
         WHERE m.date < NOW()
+        ORDER BY m.date DESC;
+        ''');
+    return result.map((e) => Match.fromPostgres(e.toColumnMap())).toList();
+  }
+
+  static Future<List<Match>> getSpecificPastMatches(String tournament) async {
+    final result = await execute('''
+        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, m.score, tourn.tricode, p.result
+        FROM matches m
+        LEFT JOIN teams t1 on m.team1 = t1.id
+        LEFT JOIN teams t2 on m.team2 = t2.id
+        LEFT JOIN tournaments tourn on m.tournament = tourn.tricode
+        LEFT JOIN predictions p on m.id = p.match_id AND p.user_id = ${User.currentUser!.id}
+        WHERE m.tournament = '$tournament' AND m.date < NOW()
         ORDER BY m.date DESC;
         ''');
     return result.map((e) => Match.fromPostgres(e.toColumnMap())).toList();
@@ -77,12 +169,13 @@ class PostgresApi {
 
   static Future<List<(Match, String)>> getUserPredictions() async {
     final result = await execute('''
-        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, m.score, p.result
+        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, m.score, tourn.tricode, p.result
         FROM matches m
         LEFT JOIN teams t1 on m.team1 = t1.id
         LEFT JOIN teams t2 on m.team2 = t2.id
+        LEFT JOIN tournaments tourn on m.tournament = tourn.tricode
         INNER JOIN predictions p on m.id = p.match_id
-        WHERE p.user_id = ${User.currentUser!.id}
+        WHERE m.tournament IN (SELECT tournament FROM tournaments HAVING COUNT(DISTINCT tricode) = 7) AND p.user_id = ${User.currentUser!.id}
         ORDER BY m.date DESC;
         ''');
     return result.map((e) {
@@ -91,39 +184,22 @@ class PostgresApi {
     }).toList();
   }
 
-  static Future<List<MapEntry<User, int>>> getGlobalRanking() async {
+  static Future<List<(Match, String)>> getUserSpecificPredictions(
+      String tournament) async {
     final result = await execute('''
-        SELECT u.id, u.username, u.emoji, p.result, m.score, m.bo
-        FROM users u
-        INNER JOIN predictions p on u.id = p.user_id
-        INNER JOIN matches m on p.match_id = m.id
-        WHERE m.date < NOW();
+        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, m.score, tourn.tricode, p.result
+        FROM matches m
+        LEFT JOIN teams t1 on m.team1 = t1.id
+        LEFT JOIN teams t2 on m.team2 = t2.id
+        LEFT JOIN tournaments tourn on m.tournament = tourn.tricode
+        INNER JOIN predictions p on m.id = p.match_id
+        WHERE m.tournament = '$tournament' AND p.user_id = ${User.currentUser!.id}
+        ORDER BY m.date DESC;
         ''');
-
-    Map<User, int> ranking = {};
-
-    for (var row in result) {
-      var map = row.toColumnMap();
-      User user = User.fromPostgres(map);
-      if (ranking[user] == null) {
-        ranking[user] = 0;
-      }
-      if (map['result'] == map['score']) {
-        int bo = map['bo'];
-        ranking[user] = ranking[user]! + (bo / 2).floor();
-      }
-      if ((map['score'].toString().codeUnits[0] >
-                  map['score'].toString().codeUnits[1] &&
-              map['result'].toString().codeUnits[0] ==
-                  map['score'].toString().codeUnits[0]) ||
-          (map['score'].toString().codeUnits[0] <
-                  map['score'].toString().codeUnits[1] &&
-              map['result'].toString().codeUnits[1] ==
-                  map['score'].toString().codeUnits[1])) {
-        ranking[user] = ranking[user]! + 1;
-      }
-    }
-    return ranking.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    return result.map((e) {
+      var map = e.toColumnMap();
+      return (Match.fromPostgres(map), map['result'].toString());
+    }).toList();
   }
 
   static Future<List<MapEntry<User, int>>> getCurrentRanking() async {
@@ -161,12 +237,129 @@ class PostgresApi {
     return ranking.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
   }
 
+  static Future<List<MapEntry<User, int>>> getSpecificCurrentRanking(
+      String tournament) async {
+    final result = await execute('''
+        SELECT u.id, u.username, u.emoji, p.result, m.score, m.bo
+        FROM users u
+        INNER JOIN predictions p on u.id = p.user_id
+        INNER JOIN matches m on p.match_id = m.id
+        WHERE m.tournament = '$tournament' AND m.date > (SELECT start_date FROM current_split WHERE id=(SELECT MAX(id) FROM current_split));
+        ''');
+
+    Map<User, int> ranking = {};
+
+    for (var row in result) {
+      var map = row.toColumnMap();
+      User user = User.fromPostgres(map);
+      if (ranking[user] == null) {
+        ranking[user] = 0;
+      }
+      if (map['result'] == map['score']) {
+        int bo = map['bo'];
+        ranking[user] = ranking[user]! + (bo / 2).floor();
+      }
+      if ((map['score'].toString().codeUnits[0] >
+                  map['score'].toString().codeUnits[1] &&
+              map['result'].toString().codeUnits[0] ==
+                  map['score'].toString().codeUnits[0]) ||
+          (map['score'].toString().codeUnits[0] <
+                  map['score'].toString().codeUnits[1] &&
+              map['result'].toString().codeUnits[1] ==
+                  map['score'].toString().codeUnits[1])) {
+        ranking[user] = ranking[user]! + 1;
+      }
+    }
+    return ranking.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+  }
+
+  static Future<List<MapEntry<User, int>>> getGlobalRanking() async {
+    final result = await execute('''
+        SELECT u.id, u.username, u.emoji, p.result, m.score, m.bo
+        FROM users u
+        INNER JOIN predictions p on u.id = p.user_id
+        INNER JOIN matches m on p.match_id = m.id
+        WHERE m.date < NOW();
+        ''');
+
+    Map<User, int> ranking = {};
+
+    for (var row in result) {
+      var map = row.toColumnMap();
+      User user = User.fromPostgres(map);
+      if (ranking[user] == null) {
+        ranking[user] = 0;
+      }
+      if (map['result'] == map['score']) {
+        int bo = map['bo'];
+        ranking[user] = ranking[user]! + (bo / 2).floor();
+      }
+      if ((map['score'].toString().codeUnits[0] >
+                  map['score'].toString().codeUnits[1] &&
+              map['result'].toString().codeUnits[0] ==
+                  map['score'].toString().codeUnits[0]) ||
+          (map['score'].toString().codeUnits[0] <
+                  map['score'].toString().codeUnits[1] &&
+              map['result'].toString().codeUnits[1] ==
+                  map['score'].toString().codeUnits[1])) {
+        ranking[user] = ranking[user]! + 1;
+      }
+    }
+    return ranking.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+  }
+
+  static Future<List<MapEntry<User, int>>> getSpecificGlobalRanking(
+      String tournament) async {
+    final result = await execute('''
+        SELECT u.id, u.username, u.emoji, p.result, m.score, m.bo
+        FROM users u
+        INNER JOIN predictions p on u.id = p.user_id
+        INNER JOIN matches m on p.match_id = m.id
+        WHERE m.tournament = '$tournament' AND m.date < NOW();
+        ''');
+
+    Map<User, int> ranking = {};
+
+    for (var row in result) {
+      var map = row.toColumnMap();
+      User user = User.fromPostgres(map);
+      if (ranking[user] == null) {
+        ranking[user] = 0;
+      }
+      if (map['result'] == map['score']) {
+        int bo = map['bo'];
+        ranking[user] = ranking[user]! + (bo / 2).floor();
+      }
+      if ((map['score'].toString().codeUnits[0] >
+                  map['score'].toString().codeUnits[1] &&
+              map['result'].toString().codeUnits[0] ==
+                  map['score'].toString().codeUnits[0]) ||
+          (map['score'].toString().codeUnits[0] <
+                  map['score'].toString().codeUnits[1] &&
+              map['result'].toString().codeUnits[1] ==
+                  map['score'].toString().codeUnits[1])) {
+        ranking[user] = ranking[user]! + 1;
+      }
+    }
+    return ranking.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+  }
+
   static Future<List<Prediction>> getMatchPredictionsById(int id) async {
     final result = await execute('''
         SELECT u.id, u.username, u.emoji, p.result
         FROM users u
         INNER JOIN predictions p on u.id = p.user_id
         WHERE p.match_id = $id;
+        ''');
+    return result.map((e) => Prediction.fromPostgres(e.toColumnMap())).toList();
+  }
+
+  static Future<List<Prediction>> getPickemPredictionsById(int id) async {
+    final result = await execute('''
+        SELECT u.id, u.username, u.emoji, p.result
+        FROM users u
+        INNER JOIN pickems_predictions p on u.id = p.user_id
+        WHERE p.question_id = $id;
         ''');
     return result.map((e) => Prediction.fromPostgres(e.toColumnMap())).toList();
   }

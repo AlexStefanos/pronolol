@@ -7,6 +7,7 @@ import 'package:pronolol/firebase_options.dart';
 import 'package:pronolol/models/user_model.dart';
 import 'package:pronolol/pages/home_page.dart';
 import 'package:pronolol/pages/login_page.dart';
+import 'package:pronolol/utils/tournaments.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +32,9 @@ class PronololApp extends StatelessWidget {
     ]);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: User.currentUser != null ? const HomePage() : const LoginPage(),
+      home: User.currentUser != null
+          ? const HomePage(Tournaments.global)
+          : const LoginPage(),
     );
   }
 }

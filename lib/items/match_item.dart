@@ -63,12 +63,21 @@ class _MatchItemState extends State<MatchItem> {
             Row(
               children: [
                 if (widget.match.isFutureMatch) ...[
-                  const SizedBox(width: 15),
-                  Text(
-                    '${widget.currentSplit}, BO : ${widget.match.bo}, ${widget.match.numericalSchedule}',
-                    style: const TextStyle(
-                        fontSize: 17, fontStyle: FontStyle.italic),
-                  ),
+                  const SizedBox(width: 15, height: 40),
+                  if ((widget.match.tournament.nameDisplay() != 'MSI') ||
+                      (widget.match.tournament.nameDisplay() != 'Worlds')) ...[
+                    Text(
+                      '${widget.match.tournament.nameDisplay()}, ${widget.match.numericalDate}, BO : ${widget.match.bo}, ${widget.match.numericalSchedule}',
+                      style: const TextStyle(
+                          fontSize: 17, fontStyle: FontStyle.italic),
+                    ),
+                  ] else ...[
+                    Text(
+                      '${widget.currentSplit}, BO : ${widget.match.bo}, ${widget.match.numericalSchedule}',
+                      style: const TextStyle(
+                          fontSize: 17, fontStyle: FontStyle.italic),
+                    ),
+                  ],
                   const Expanded(child: SizedBox(width: 1)),
                   IconButton(
                     onPressed: () {
@@ -78,12 +87,21 @@ class _MatchItemState extends State<MatchItem> {
                     iconSize: 30.0,
                   )
                 ] else ...[
-                  const SizedBox(width: 15, height: 40),
-                  Text(
-                    '${widget.currentSplit}, ${widget.match.literatureDate}, ${widget.match.numericalSchedule}',
-                    style: const TextStyle(
-                        fontSize: 17, fontStyle: FontStyle.italic),
-                  ),
+                  if ((widget.match.tournament.nameDisplay() != 'MSI') ||
+                      (widget.match.tournament.nameDisplay() != 'Worlds')) ...[
+                    const SizedBox(width: 15, height: 40),
+                    Text(
+                      '${widget.currentSplit}, ${widget.match.numericalDate}, ${widget.match.numericalSchedule}',
+                      style: const TextStyle(
+                          fontSize: 17, fontStyle: FontStyle.italic),
+                    ),
+                  ] else ...[
+                    Text(
+                      '${widget.match.tournament.nameDisplay()}, ${widget.match.numericalDate}, ${widget.match.numericalSchedule}',
+                      style: const TextStyle(
+                          fontSize: 17, fontStyle: FontStyle.italic),
+                    ),
+                  ],
                 ],
               ],
             ),
@@ -104,7 +122,9 @@ class _MatchItemState extends State<MatchItem> {
                       fontSize: 20,
                     ),
                   ),
-                  const Text('-'),
+                  if (widget.pageKey != 'passés') ...[
+                    const Text('-'),
+                  ],
                   if (widget.match.score != null) ...[
                     Stack(
                       clipBehavior: Clip.none,
@@ -129,7 +149,7 @@ class _MatchItemState extends State<MatchItem> {
                         ),
                         if (widget.match.isCurrentUserPerfectWinner) ...[
                           Positioned(
-                            left: 18,
+                            left: 8.5,
                             top: -22,
                             child: Image.network(
                               'https://i.pinimg.com/originals/39/1a/96/391a964218aa5d42228201804286641c.png',

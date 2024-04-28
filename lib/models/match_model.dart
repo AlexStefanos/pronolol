@@ -1,9 +1,11 @@
 import 'package:pronolol/models/team_model.dart';
 import 'package:intl/intl.dart';
+import 'package:pronolol/models/tournament_model.dart';
+import 'package:pronolol/api/postgres.dart';
 
 class Match {
   Match(this.id, this.team1, this.team2, this.date, this.bo, this.score,
-      this.currentUserPrediction);
+      this.tournament, this.currentUserPrediction);
 
   final _numericalFormat = DateFormat('dd/MM/y HH:mm', 'fr_FR');
   final _literatureFormat = DateFormat('EEEE dd MMMM', 'fr_FR');
@@ -15,6 +17,7 @@ class Match {
   final DateTime date;
   final int bo;
   final String? score;
+  final Tournament tournament;
   String? currentUserPrediction;
 
   String get numericalDate {
@@ -60,6 +63,8 @@ class Match {
         data['date'],
         data['bo'],
         data['score'],
+        Tournament(PostgresApi.getTournamentsName(data['tourn_tricode']),
+            data['tourn_logo'], data['beginDate'] ?? DateTime.now()),
         data['result']);
   }
 }
