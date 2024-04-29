@@ -29,12 +29,7 @@ class PostgresApi {
 
   static Future<User?> getUserByPin(String cpin) async {
     final result = await execute('SELECT * FROM users WHERE cpin = \'$cpin\';');
-    if (result.firstOrNull == null) {
-      createUser(cpin);
-    } else {
-      return User.fromPostgres(result.first.toColumnMap());
-    }
-    return null;
+    return User.fromPostgres(result.first.toColumnMap());
   }
 
   static Future<List<String>> getUsers() async {
@@ -44,18 +39,20 @@ class PostgresApi {
     }).toList();
   }
 
-  static Future<void> createUser(String cpin) async {
-    final result = await execute(
-        'INSERT INTO users (id, cpin) VALUES ((SELECT MAX(id)+1 FROM users), \'$cpin\');');
+  static Future<void> createUser(String cpin, userName, userEmoji) async {
+    await execute(
+        'INSERT INTO users (id, username, emoji, cpin) VALUES ((SELECT MAX(id)+1 FROM users), \'$userName\', \'$userEmoji\', \'$cpin\');');
+    await User.saveUserPin(cpin);
   }
 
-  static Future<void> updateUser(String cpin, String userName) async {
-    final result = await execute(
-        'UPDATE users SET username = \'$userName\' WHERE cpin = \'$cpin\';');
+  static Future<void> updateUser(
+      String cpin, String userName, String userEmoji) async {
+    await execute(
+        'UPDATE users SET username = \'$userName\', emoji = \'$userEmoji\' WHERE cpin = \'$cpin\';');
   }
 
   static Future<bool> doesUserExists(String cpin) async {
-    final result = await execute('SELECT 1 FROM users WHERE cpin = \'$cpin\';');
+    final result = await execute('SELECT * FROM users WHERE cpin = \'$cpin\';');
     if (result.isEmpty) {
       return false;
     } else {

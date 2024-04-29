@@ -27,6 +27,14 @@ class _RankingPageState extends State<RankingPage> {
     Restart.restartApp();
   }
 
+  List<int> getScoresList(scoresList) {
+    List<int> result = [];
+    for (var elem in scoresList) {
+      result.add(elem.value);
+    }
+    return result;
+  }
+
   @override
   void initState() {
     if (widget.tournament == Tournaments.global) {
@@ -186,8 +194,8 @@ class _RankingPageState extends State<RankingPage> {
                         itemBuilder: (ctx, i) => RankingItem(
                             snapshot.data![i].key,
                             snapshot.data![i].value,
-                            snapshot.data!.length,
-                            i + 1),
+                            i + 1,
+                            getScoresList(snapshot.data!)),
                       );
                     } else {
                       return const Center(child: CircularProgressIndicator());
@@ -210,8 +218,8 @@ class _RankingPageState extends State<RankingPage> {
                         itemBuilder: (ctx, i) => RankingItem(
                             snapshot.data![i].key,
                             snapshot.data![i].value,
-                            snapshot.data!.length,
-                            i + 1),
+                            i + 1,
+                            getScoresList(snapshot.data!)),
                       );
                     } else {
                       return const Center(child: CircularProgressIndicator());

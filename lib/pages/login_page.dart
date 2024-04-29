@@ -18,6 +18,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   var pin = ['', '', '', ''];
   String userEmoji = '';
+  bool _userExistance = false;
   FocusNode focusNode1 = FocusNode();
   FocusNode focusNode2 = FocusNode();
   FocusNode focusNode3 = FocusNode();
@@ -145,10 +146,12 @@ class _LoginPageState extends State<LoginPage> {
                               pin[3] = value;
                             }
                             if (!pin.contains('')) {
-                              if (PostgresApi.doesUserExists(
-                                          encryptPassword(pinToString(pin)))
-                                      .then((value) => value) ==
-                                  Future<bool>.value(true)) {
+                              await PostgresApi.doesUserExists(
+                                      encryptPassword(pinToString(pin)))
+                                  .then((value) => setState(() {
+                                        _userExistance = value;
+                                      }));
+                              if (_userExistance) {
                                 await User.saveUserPin(
                                     encryptPassword(pinToString(pin)));
                                 if (context.mounted) {
@@ -158,19 +161,12 @@ class _LoginPageState extends State<LoginPage> {
                                               Tournaments.global)));
                                 }
                               } else {
-                                PostgresApi.createUser(
-                                    encryptPassword(pinToString(pin)));
                                 await showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
-                                      return InscriptionModal(pinToString(pin));
+                                      return InscriptionModal(
+                                          encryptPassword(pinToString(pin)));
                                     });
-                                if (context.mounted) {
-                                  Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                          builder: (context) => const HomePage(
-                                              Tournaments.global)));
-                                }
                               }
                             }
                           },
@@ -190,9 +186,12 @@ class _LoginPageState extends State<LoginPage> {
             IconButton.filled(
               onPressed: () async {
                 if (!pin.contains('')) {
-                  if (PostgresApi.doesUserExists(
-                          encryptPassword(pinToString(pin))) ==
-                      Future<bool>.value(true)) {
+                  await PostgresApi.doesUserExists(
+                          encryptPassword(pinToString(pin)))
+                      .then((value) => setState(() {
+                            _userExistance = value;
+                          }));
+                  if (_userExistance) {
                     await User.saveUserPin(encryptPassword(pinToString(pin)));
                     if (context.mounted) {
                       Navigator.of(context).pushReplacement(MaterialPageRoute(
@@ -200,17 +199,12 @@ class _LoginPageState extends State<LoginPage> {
                               const HomePage(Tournaments.global)));
                     }
                   } else {
-                    PostgresApi.createUser(encryptPassword(pinToString(pin)));
                     await showDialog(
                         context: context,
                         builder: (BuildContext context) {
-                          return InscriptionModal(pinToString(pin));
+                          return InscriptionModal(
+                              encryptPassword(pinToString(pin)));
                         });
-                    if (context.mounted) {
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(
-                          builder: (context) =>
-                              const HomePage(Tournaments.global)));
-                    }
                   }
                 }
               },

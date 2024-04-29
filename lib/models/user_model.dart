@@ -28,8 +28,8 @@ class User {
     User.currentUser = await PostgresApi.getUserById(id);
   }
 
-  static Future<void> saveUserPin(String pin) async {
-    User.currentUser = await PostgresApi.getUserByPin(pin);
+  static Future<void> saveUserPin(String cpin) async {
+    User.currentUser = await PostgresApi.getUserByPin(cpin);
     String id = User.currentUser!.id.toString();
     SharedPreferences instance = await SharedPreferences.getInstance();
     await instance.setString('id', id);
