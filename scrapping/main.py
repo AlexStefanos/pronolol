@@ -11,11 +11,11 @@ options = webdriver.ChromeOptions()
 options.add_argument('--headless')
 options.add_experimental_option('excludeSwitches', ['-enable-logging'])
 driver = webdriver.Chrome(options=options)
-driver.get('https://lolesports.com/fr-FR/schedule?leagues=lec')
+driver.get('https://www.flashscore.fr/esports/league-of-legends/lec/calendrier/')
 
 # Wait for the page to load and get all the match information
-WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.col-span_span_8')))
-event = driver.find_element(By.CSS_SELECTOR, '.col-span_span_8')
+WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.event__match')))
+event = driver.find_element(By.CSS_SELECTOR, '.event__match')
 events = event.find_elements(By.XPATH, '*')
 
 conn = psycopg2.connect(user='doadmin',
@@ -53,13 +53,13 @@ def to_date(value):
         data[1] = 'december'
     return datetime.strptime(data[0] + ' ' + data[1], '%d %B').replace(year=2024)
 
-
+'''
 utc = pytz.utc
 cursorDate = conn.cursor()
 '''
-cursorDate.execute('SELECT DISTINCT ON (date) * FROM matches ORDER BY date DESC LIMIT 1')
-date_last_match = cursorDate.fetchall()
-cleaned_date = datetime.strptime(format(date_last_match[0][3], '%d/%m/%y %H:%M:%S'), '%d/%m/%y %H:%M:%S')
+#cursorDate.execute('SELECT DISTINCT ON (date) * FROM matches ORDER BY date DESC LIMIT 1')
+#date_last_match = cursorDate.fetchall()
+#cleaned_date = datetime.strptime(format(date_last_match[0][3], '%d/%m/%y %H:%M:%S'), '%d/%m/%y %H:%M:%S')
 '''
 cursorDate.execute('SELECT start_date FROM current_split WHERE id=(SELECT MAX(id) FROM current_split)')
 date_start_split = cursorDate.fetchall()
@@ -81,14 +81,16 @@ for event in events:
         date_replaced = date_localized.replace(hour=int(hour), minute=int(minute))
         if date_replaced > date_start_split[0][0]:
             date_final = date_replaced.strftime('%Y-%m-%d %H:%M:%S')
-            team1 = event.find_element(By.CLASS_NAME, 'team1').find_element(By.CLASS_NAME, 'tricode').text
-            team2 = event.find_element(By.CLASS_NAME, 'team2').find_element(By.CLASS_NAME, 'tricode').text
-            league = event.find_element(By.CLASS_NAME, 'league').find_element(By.CLASS_NAME, 'name').text
-            bo = int(event.find_element(By.CLASS_NAME, 'strategy').text[-1])
+            team1 = event.find_element(By.CLASS_NAME, 'event__participant event__participant--home').find_element(By.CLASS_NAME, 'tricode').text
+            team2 = event.find_element(By.CLASS_NAME, 'event__participant event__participant--away').find_element(By.CLASS_NAME, 'tricode').text
+            league = 'LEC'
+            bo = 0
+            if(bo == 0):
+                bo = input('BO1? BO3? BO5?')
             score = None
-            if len(event.find_elements(By.CLASS_NAME, 'score')) > 0:
-                score = event.find_element(By.CLASS_NAME, 'scoreTeam1').text + event.find_element(By.CLASS_NAME,
-                                                                                                  'scoreTeam2').text
+            if event.find_elements(By.CLASS_NAME, 'event__score event__score--home'):
+                score = event.find_element(By.CLASS_NAME, 'event__score event__score--home').text + 
+                    event.find_element(By.CLASS_NAME, 'event__participant event__participant--away').text
             naive_date_replaced = datetime.replace(date_replaced, tzinfo=None)
             if score:
                 print(date_final + ' ' + team1 + ' ' + team2 + ' ' + score)
@@ -115,4 +117,7 @@ for event in events:
                     cur.execute('UPDATE matches SET score=' + score + ' WHERE (date=\'' + date_final + '\')')
                     conn.commit()
                     print('Updated')
+'''
+for event in events:
+    print(event)
 driver.quit()
