@@ -19,6 +19,7 @@ class RankingPage extends StatefulWidget {
 class _RankingPageState extends State<RankingPage> {
   var _currentRanking = PostgresApi.getCurrentRanking();
   var _globalRanking = PostgresApi.getGlobalRanking();
+  var _tournamentChosen = Tournaments.global;
 
   void _disconnection() async {
     User.currentUser = null;
@@ -90,82 +91,103 @@ class _RankingPageState extends State<RankingPage> {
         appBar: AppBar(
           title: const Text('pronolol'),
           actions: [
-            DropdownMenu(
-                width: 200,
-                inputDecorationTheme: InputDecorationTheme(
-                  constraints: BoxConstraints.tight(const Size.fromHeight(55)),
-                ),
-                label: const Text(
-                  '(Cliquer pour choisir un tournoi à afficher)',
-                  style: TextStyle(fontStyle: FontStyle.italic, fontSize: 14),
-                ),
-                onSelected: (tournament) {
-                  if (tournament == Tournaments.global) {
-                    setState(() {
-                      _currentRanking = PostgresApi.getCurrentRanking();
-                      _globalRanking = PostgresApi.getGlobalRanking();
-                    });
-                  } else if (tournament == Tournaments.lec) {
-                    setState(() {
-                      _currentRanking =
-                          PostgresApi.getSpecificCurrentRanking('LEC');
-                      _globalRanking =
-                          PostgresApi.getSpecificGlobalRanking('LEC');
-                    });
-                  } else if (tournament == Tournaments.lck) {
-                    setState(() {
-                      _currentRanking =
-                          PostgresApi.getSpecificCurrentRanking('LCK');
-                      _globalRanking =
-                          PostgresApi.getSpecificGlobalRanking('LCK');
-                    });
-                  } else if (tournament == Tournaments.lpl) {
-                    setState(() {
-                      _currentRanking =
-                          PostgresApi.getSpecificCurrentRanking('LPL');
-                      _globalRanking =
-                          PostgresApi.getSpecificGlobalRanking('LPL');
-                    });
-                  } else if (tournament == Tournaments.msi) {
-                    setState(() {
-                      _currentRanking =
-                          PostgresApi.getSpecificCurrentRanking('MSI');
-                      _globalRanking =
-                          PostgresApi.getSpecificGlobalRanking('MSI');
-                    });
-                  } else if (tournament == Tournaments.worlds) {
-                    setState(() {
-                      _currentRanking =
-                          PostgresApi.getSpecificCurrentRanking('WORLDS');
-                      _globalRanking =
-                          PostgresApi.getSpecificGlobalRanking('WORLDS');
-                    });
-                  } else if (tournament == Tournaments.lfl) {
-                    setState(() {
-                      _currentRanking =
-                          PostgresApi.getSpecificCurrentRanking('lfl');
-                      _globalRanking =
-                          PostgresApi.getSpecificGlobalRanking('lfl');
-                    });
-                  } else if (tournament == Tournaments.eum) {
-                    setState(() {
-                      _currentRanking =
-                          PostgresApi.getSpecificCurrentRanking('eum');
-                      _globalRanking =
-                          PostgresApi.getSpecificGlobalRanking('eum');
-                    });
-                  }
-                },
-                dropdownMenuEntries: const <DropdownMenuEntry<Tournaments>>[
-                  DropdownMenuEntry(value: Tournaments.global, label: 'Global'),
-                  DropdownMenuEntry(value: Tournaments.lec, label: 'LEC'),
-                  DropdownMenuEntry(value: Tournaments.lck, label: 'LCK'),
-                  DropdownMenuEntry(value: Tournaments.lpl, label: 'LPL'),
-                  DropdownMenuEntry(value: Tournaments.msi, label: 'MSI'),
-                  DropdownMenuEntry(value: Tournaments.worlds, label: 'WORLDS'),
-                  DropdownMenuEntry(value: Tournaments.lfl, label: 'LFL'),
-                  DropdownMenuEntry(value: Tournaments.eum, label: 'EUM'),
-                ]),
+            const SizedBox(
+              width: 115,
+            ),
+            DropdownButton<Tournaments>(
+              value: _tournamentChosen,
+              icon: const Icon(
+                Icons.menu_open,
+                size: 22,
+              ),
+              items: const [
+                DropdownMenuItem<Tournaments>(
+                    value: Tournaments.global, child: Text('Global          ')),
+                DropdownMenuItem<Tournaments>(
+                    value: Tournaments.lec, child: Text('LEC          ')),
+                DropdownMenuItem<Tournaments>(
+                    value: Tournaments.lck, child: Text('LCK          ')),
+                DropdownMenuItem<Tournaments>(
+                    value: Tournaments.lpl, child: Text('LPL          ')),
+                DropdownMenuItem<Tournaments>(
+                    value: Tournaments.msi, child: Text('MSI          ')),
+                DropdownMenuItem<Tournaments>(
+                    value: Tournaments.worlds, child: Text('Worlds          ')),
+                DropdownMenuItem<Tournaments>(
+                    value: Tournaments.lfl, child: Text('LFL          ')),
+                DropdownMenuItem<Tournaments>(
+                    value: Tournaments.eum, child: Text('EUM          ')),
+              ],
+              onChanged: (tournament) {
+                if (tournament == Tournaments.global) {
+                  setState(() {
+                    _tournamentChosen = Tournaments.global;
+                    _currentRanking = PostgresApi.getCurrentRanking();
+                    _globalRanking = PostgresApi.getGlobalRanking();
+                  });
+                } else if (tournament == Tournaments.lec) {
+                  setState(() {
+                    _tournamentChosen = Tournaments.lec;
+                    _currentRanking =
+                        PostgresApi.getSpecificCurrentRanking('LEC');
+                    _globalRanking =
+                        PostgresApi.getSpecificGlobalRanking('LEC');
+                  });
+                } else if (tournament == Tournaments.lck) {
+                  setState(() {
+                    _tournamentChosen = Tournaments.lck;
+                    _currentRanking =
+                        PostgresApi.getSpecificCurrentRanking('LCK');
+                    _globalRanking =
+                        PostgresApi.getSpecificGlobalRanking('LCK');
+                  });
+                } else if (tournament == Tournaments.lpl) {
+                  setState(() {
+                    _tournamentChosen = Tournaments.lpl;
+                    _currentRanking =
+                        PostgresApi.getSpecificCurrentRanking('LPL');
+                    _globalRanking =
+                        PostgresApi.getSpecificGlobalRanking('LPL');
+                  });
+                } else if (tournament == Tournaments.msi) {
+                  setState(() {
+                    _tournamentChosen = Tournaments.msi;
+                    _currentRanking =
+                        PostgresApi.getSpecificCurrentRanking('MSI');
+                    _globalRanking =
+                        PostgresApi.getSpecificGlobalRanking('MSI');
+                  });
+                } else if (tournament == Tournaments.worlds) {
+                  setState(() {
+                    _tournamentChosen = Tournaments.worlds;
+                    _currentRanking =
+                        PostgresApi.getSpecificCurrentRanking('WORLDS');
+                    _globalRanking =
+                        PostgresApi.getSpecificGlobalRanking('WORLDS');
+                  });
+                } else if (tournament == Tournaments.lfl) {
+                  setState(() {
+                    _tournamentChosen = Tournaments.lfl;
+                    _currentRanking =
+                        PostgresApi.getSpecificCurrentRanking('LFL');
+                    _globalRanking =
+                        PostgresApi.getSpecificGlobalRanking('LFL');
+                  });
+                } else if (tournament == Tournaments.eum) {
+                  setState(() {
+                    _tournamentChosen = Tournaments.eum;
+                    _currentRanking =
+                        PostgresApi.getSpecificCurrentRanking('EUM');
+                    _globalRanking =
+                        PostgresApi.getSpecificGlobalRanking('EUM');
+                  });
+                }
+              },
+            ),
+            const Expanded(
+                child: SizedBox(
+              width: 1,
+            )),
             IconButton(
               onPressed: _disconnection,
               icon: const Icon(Icons.login),
@@ -176,10 +198,7 @@ class _RankingPageState extends State<RankingPage> {
             )
           ],
           bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Score du Split Actuel'),
-              Tab(text: 'Score Total')
-            ],
+            tabs: [Tab(text: 'Split/Tournoi en cours'), Tab(text: 'Total')],
           ),
         ),
         body: TabBarView(

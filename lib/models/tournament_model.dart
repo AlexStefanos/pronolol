@@ -4,7 +4,7 @@ import 'package:pronolol/utils/tournaments.dart';
 class Tournament {
   Tournament(this.name, this.logo, this.beginDate);
 
-  final Tournaments? name;
+  Tournaments? name;
   final String? logo;
   final DateTime beginDate;
 
@@ -20,5 +20,9 @@ class Tournament {
 
   String get numericalDate {
     return _numericalFormat.format(beginDate);
+  }
+
+  Tournaments? get tournamentName {
+    return name;
   }
 }

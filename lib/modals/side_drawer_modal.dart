@@ -43,7 +43,7 @@ class SideDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: Image.asset('assets/LEC_logo.png', height: 40, width: 40),
-            title: const Text('Prédictions - Global'),
+            title: const Text('Prédictions - LEC'),
             onTap: () => {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: ((context) => const HomePage(Tournaments.lec))))
@@ -126,7 +126,7 @@ class SideDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: Image.asset('assets/LFL_logo.png', height: 40, width: 40),
-            title: const Text('Prédictions - Global'),
+            title: const Text('Prédictions - LFL'),
             onTap: () => {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: ((context) => const HomePage(Tournaments.lfl))))
@@ -142,7 +142,7 @@ class SideDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: Image.asset('assets/EUM_logo.png', height: 40, width: 40),
-            title: const Text('Prédictions - Global'),
+            title: const Text('Prédictions - EUM'),
             onTap: () => {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: ((context) => const HomePage(Tournaments.eum))))

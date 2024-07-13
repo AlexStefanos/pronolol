@@ -33,11 +33,11 @@ class _PlayersPredictionsModalState extends State<PlayersPredictionsModal> {
                   alignment: Alignment.centerLeft,
                 ),
                 const SizedBox(width: 10),
-                Text(widget.match.team1.name),
+                Text(widget.match.team1.properTricode()),
                 const Expanded(child: SizedBox(width: 1)),
                 const Text('-'),
                 const Expanded(child: SizedBox(width: 1)),
-                Text(widget.match.team2.name),
+                Text(widget.match.team2.properTricode()),
                 const SizedBox(width: 10),
                 Image.network(
                   widget.match.team2.logo,

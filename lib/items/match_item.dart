@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pronolol/api/postgres.dart';
 import 'package:pronolol/modals/players_predictions_modal.dart';
 import 'package:pronolol/modals/prediction_modal.dart';
+import 'package:pronolol/modals/team_previous_games_modal.dart';
 import 'package:pronolol/models/match_model.dart';
 import 'package:pronolol/utils/colors.dart';
 
@@ -36,6 +37,22 @@ class _MatchItemState extends State<MatchItem> {
         context: ctx,
         builder: (BuildContext context) {
           return PlayersPredictionsModal(widget.match);
+        });
+  }
+
+  void showTeam1Modal(BuildContext ctx) {
+    showDialog(
+        context: ctx,
+        builder: (BuildContext context) {
+          return TeamPreviousGamesModal(widget.match.team1);
+        });
+  }
+
+  void showTeam2Modal(BuildContext ctx) {
+    showDialog(
+        context: ctx,
+        builder: (BuildContext context) {
+          return TeamPreviousGamesModal(widget.match.team2);
         });
   }
 
@@ -111,13 +128,25 @@ class _MatchItemState extends State<MatchItem> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.network(
-                    widget.match.team1.logo,
-                    width: 50,
-                    alignment: Alignment.center,
+                  Ink(
+                    decoration: BoxDecoration(
+                      border:
+                          Border.all(color: Colors.grey.shade800, width: 3.0),
+                      shape: BoxShape.circle,
+                    ),
+                    child: InkWell(
+                      child: IconButton(
+                        onPressed: () => showTeam1Modal(context),
+                        icon: Image.network(
+                          widget.match.team1.logo,
+                          width: 50,
+                          alignment: Alignment.center,
+                        ),
+                      ),
+                    ),
                   ),
                   Text(
-                    widget.match.team1.name.padLeft(3),
+                    widget.match.team1.properTricode().padLeft(3),
                     style: const TextStyle(
                       fontSize: 20,
                     ),
@@ -162,15 +191,27 @@ class _MatchItemState extends State<MatchItem> {
                     )
                   ],
                   Text(
-                    widget.match.team2.name.padRight(3),
+                    widget.match.team2.properTricode().padRight(3),
                     style: const TextStyle(
                       fontSize: 20,
                     ),
                   ),
-                  Image.network(
-                    widget.match.team2.logo,
-                    width: 50,
-                    alignment: Alignment.center,
+                  Ink(
+                    decoration: BoxDecoration(
+                      border:
+                          Border.all(color: Colors.grey.shade800, width: 3.0),
+                      shape: BoxShape.circle,
+                    ),
+                    child: InkWell(
+                      child: IconButton(
+                        onPressed: () => showTeam2Modal(context),
+                        icon: Image.network(
+                          widget.match.team2.logo,
+                          width: 50,
+                          alignment: Alignment.center,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),

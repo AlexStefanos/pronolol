@@ -33,8 +33,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    _tournamentChosen = Tournaments.global;
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      await PostgresApi.getCurrentSplit().then((value) => setState(() {
+      await PostgresApi.getCurrentTournament().then((value) => setState(() {
             _currentSplit = value;
           }));
     });
@@ -77,14 +78,14 @@ class _HomePageState extends State<HomePage> {
     } else if (widget.tournament == Tournaments.lfl) {
       setState(() {
         _tournamentChosen = Tournaments.lfl;
-        _matchesToCome = PostgresApi.getSpecificMatchesToCome('lfl');
-        _pastMatches = PostgresApi.getSpecificPastMatches('lfl');
+        _matchesToCome = PostgresApi.getSpecificMatchesToCome('LFL');
+        _pastMatches = PostgresApi.getSpecificPastMatches('LFL');
       });
     } else if (widget.tournament == Tournaments.eum) {
       setState(() {
         _tournamentChosen = Tournaments.eum;
-        _matchesToCome = PostgresApi.getSpecificMatchesToCome('eum');
-        _pastMatches = PostgresApi.getSpecificPastMatches('eum');
+        _matchesToCome = PostgresApi.getSpecificMatchesToCome('EUM');
+        _pastMatches = PostgresApi.getSpecificPastMatches('EUM');
       });
     }
     super.initState();
@@ -98,16 +99,34 @@ class _HomePageState extends State<HomePage> {
         drawer: const SideDrawer(),
         appBar: AppBar(
           actions: [
-            DropdownMenu(
-              width: 200,
-              inputDecorationTheme: InputDecorationTheme(
-                constraints: BoxConstraints.tight(const Size.fromHeight(55)),
+            const SizedBox(
+              width: 115,
+            ),
+            DropdownButton<Tournaments>(
+              value: _tournamentChosen,
+              icon: const Icon(
+                Icons.menu_open,
+                size: 22,
               ),
-              label: const Text(
-                '(Cliquer pour choisir un tournoi à afficher)',
-                style: TextStyle(fontStyle: FontStyle.italic, fontSize: 14),
-              ),
-              onSelected: (tournament) {
+              items: const [
+                DropdownMenuItem<Tournaments>(
+                    value: Tournaments.global, child: Text('Global          ')),
+                DropdownMenuItem<Tournaments>(
+                    value: Tournaments.lec, child: Text('LEC          ')),
+                DropdownMenuItem<Tournaments>(
+                    value: Tournaments.lck, child: Text('LCK          ')),
+                DropdownMenuItem<Tournaments>(
+                    value: Tournaments.lpl, child: Text('LPL          ')),
+                DropdownMenuItem<Tournaments>(
+                    value: Tournaments.msi, child: Text('MSI          ')),
+                DropdownMenuItem<Tournaments>(
+                    value: Tournaments.worlds, child: Text('Worlds          ')),
+                DropdownMenuItem<Tournaments>(
+                    value: Tournaments.lfl, child: Text('LFL          ')),
+                DropdownMenuItem<Tournaments>(
+                    value: Tournaments.eum, child: Text('EUM          ')),
+              ],
+              onChanged: (tournament) {
                 if (tournament == Tournaments.global) {
                   setState(() {
                     _tournamentChosen = Tournaments.global;
@@ -118,22 +137,22 @@ class _HomePageState extends State<HomePage> {
                   setState(() {
                     _tournamentChosen = Tournaments.lec;
                     _matchesToCome =
-                        PostgresApi.getSpecificMatchesToCome('lec');
-                    _pastMatches = PostgresApi.getSpecificPastMatches('lec');
+                        PostgresApi.getSpecificMatchesToCome('LEC');
+                    _pastMatches = PostgresApi.getSpecificPastMatches('LEC');
                   });
                 } else if (tournament == Tournaments.lck) {
                   setState(() {
                     _tournamentChosen = Tournaments.lck;
                     _matchesToCome =
-                        PostgresApi.getSpecificMatchesToCome('lck');
-                    _pastMatches = PostgresApi.getSpecificPastMatches('lck');
+                        PostgresApi.getSpecificMatchesToCome('LCK');
+                    _pastMatches = PostgresApi.getSpecificPastMatches('LCK');
                   });
                 } else if (tournament == Tournaments.lpl) {
                   setState(() {
                     _tournamentChosen = Tournaments.lpl;
                     _matchesToCome =
-                        PostgresApi.getSpecificMatchesToCome('lpl');
-                    _pastMatches = PostgresApi.getSpecificPastMatches('lpl');
+                        PostgresApi.getSpecificMatchesToCome('LPL');
+                    _pastMatches = PostgresApi.getSpecificPastMatches('LPL');
                   });
                 } else if (tournament == Tournaments.msi) {
                   setState(() {
@@ -153,29 +172,23 @@ class _HomePageState extends State<HomePage> {
                   setState(() {
                     _tournamentChosen = Tournaments.lfl;
                     _matchesToCome =
-                        PostgresApi.getSpecificMatchesToCome('lfl');
-                    _pastMatches = PostgresApi.getSpecificPastMatches('lfl');
+                        PostgresApi.getSpecificMatchesToCome('LFL');
+                    _pastMatches = PostgresApi.getSpecificPastMatches('LFL');
                   });
                 } else if (tournament == Tournaments.eum) {
                   setState(() {
                     _tournamentChosen = Tournaments.eum;
                     _matchesToCome =
-                        PostgresApi.getSpecificMatchesToCome('eum');
-                    _pastMatches = PostgresApi.getSpecificPastMatches('eum');
+                        PostgresApi.getSpecificMatchesToCome('EUM');
+                    _pastMatches = PostgresApi.getSpecificPastMatches('EUM');
                   });
                 }
               },
-              dropdownMenuEntries: const <DropdownMenuEntry<Tournaments>>[
-                DropdownMenuEntry(value: Tournaments.global, label: 'Global'),
-                DropdownMenuEntry(value: Tournaments.lec, label: 'LEC'),
-                DropdownMenuEntry(value: Tournaments.lck, label: 'LCK'),
-                DropdownMenuEntry(value: Tournaments.lpl, label: 'LPL'),
-                DropdownMenuEntry(value: Tournaments.msi, label: 'MSI'),
-                DropdownMenuEntry(value: Tournaments.worlds, label: 'WORLDS'),
-                DropdownMenuEntry(value: Tournaments.lfl, label: 'LFL'),
-                DropdownMenuEntry(value: Tournaments.eum, label: 'EUM'),
-              ],
             ),
+            const Expanded(
+                child: SizedBox(
+              width: 1,
+            )),
             IconButton(
               onPressed: _disconnection,
               icon: const Icon(Icons.exit_to_app),
@@ -225,7 +238,48 @@ class _HomePageState extends State<HomePage> {
             ),
             onRefresh: () {
               return Future(() {
-                setState(() {});
+                setState(() {
+                  if (_tournamentChosen == Tournaments.global) {
+                    setState(() {
+                      _matchesToCome = PostgresApi.getMatchesToCome();
+                    });
+                  } else if (_tournamentChosen == Tournaments.lec) {
+                    setState(() {
+                      _matchesToCome =
+                          PostgresApi.getSpecificMatchesToCome('LEC');
+                    });
+                  } else if (_tournamentChosen == Tournaments.lck) {
+                    setState(() {
+                      _matchesToCome =
+                          PostgresApi.getSpecificMatchesToCome('LCK');
+                    });
+                  } else if (_tournamentChosen == Tournaments.lpl) {
+                    setState(() {
+                      _matchesToCome =
+                          PostgresApi.getSpecificMatchesToCome('LPL');
+                    });
+                  } else if (_tournamentChosen == Tournaments.msi) {
+                    setState(() {
+                      _matchesToCome =
+                          PostgresApi.getSpecificMatchesToCome('MSI');
+                    });
+                  } else if (_tournamentChosen == Tournaments.worlds) {
+                    setState(() {
+                      _matchesToCome =
+                          PostgresApi.getSpecificMatchesToCome('WORLDS');
+                    });
+                  } else if (_tournamentChosen == Tournaments.lfl) {
+                    setState(() {
+                      _matchesToCome =
+                          PostgresApi.getSpecificMatchesToCome('LFL');
+                    });
+                  } else if (_tournamentChosen == Tournaments.eum) {
+                    setState(() {
+                      _matchesToCome =
+                          PostgresApi.getSpecificMatchesToCome('EUM');
+                    });
+                  }
+                });
               });
             },
           ),
@@ -249,7 +303,42 @@ class _HomePageState extends State<HomePage> {
             ),
             onRefresh: () {
               return Future(() {
-                setState(() {});
+                setState(() {
+                  if (_tournamentChosen == Tournaments.global) {
+                    setState(() {
+                      _pastMatches = PostgresApi.getPastMatches();
+                    });
+                  } else if (_tournamentChosen == Tournaments.lec) {
+                    setState(() {
+                      _pastMatches = PostgresApi.getSpecificPastMatches('LEC');
+                    });
+                  } else if (_tournamentChosen == Tournaments.lck) {
+                    setState(() {
+                      _pastMatches = PostgresApi.getSpecificPastMatches('LCK');
+                    });
+                  } else if (_tournamentChosen == Tournaments.lpl) {
+                    setState(() {
+                      _pastMatches = PostgresApi.getSpecificPastMatches('LPL');
+                    });
+                  } else if (_tournamentChosen == Tournaments.msi) {
+                    setState(() {
+                      _pastMatches = PostgresApi.getSpecificPastMatches('MSI');
+                    });
+                  } else if (_tournamentChosen == Tournaments.worlds) {
+                    setState(() {
+                      _pastMatches =
+                          PostgresApi.getSpecificPastMatches('WORLDS');
+                    });
+                  } else if (_tournamentChosen == Tournaments.lfl) {
+                    setState(() {
+                      _pastMatches = PostgresApi.getSpecificPastMatches('LFL');
+                    });
+                  } else if (_tournamentChosen == Tournaments.eum) {
+                    setState(() {
+                      _pastMatches = PostgresApi.getSpecificPastMatches('EUM');
+                    });
+                  }
+                });
               });
             },
           ),

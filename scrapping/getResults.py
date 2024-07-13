@@ -1,10 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timedelta, tzinfo
 import psycopg2
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pytz
+import sys
 
 utc = pytz.utc
 
@@ -236,6 +237,8 @@ if scrapping_result_mode == '0':
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
             event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
             events = event.find_elements(By.CLASS_NAME, 'event__match')
+        else:
+            sys.exit()
         for event in events:
             #print(event)
             cur = conn.cursor()
@@ -247,21 +250,56 @@ if scrapping_result_mode == '0':
                 date = to_date(monthday)
                 date_localized = utc.localize(date)
                 print(date_localized)
-                try:
-                    date_str = date_localized.strftime('%Y-%m-%d %H:%M:%S')
-                    cursorDate = conn.cursor()
-                    cursorDate.execute('SELECT DISTINCT ON (date) * FROM matches WHERE date = \'' + date_str + '\'')
-                    existing_match = cursorDate.fetchall()
-                    date_existing_match = existing_match[0][3]
-                    team1_existing_match = existing_match[0][1]
-                    team2_existing_match = existing_match[0][2]
-                    match_id_existing_match = existing_match[0][0]
-                    score_existing_match = existing_match[0][5]
-                    exist = True
-                except:
-                    print('Match doesn\'t exist or has already a result')
-                    date_existing_match = datetime.now()
-                if date_existing_match == date_localized:
+                date_existing_match = None
+                i = 0
+                searching_up_date_str = None
+                searching_down_date_str = None
+                searching_up_date_localized = None
+                searching_down_date_localized = None
+                while (date_existing_match is None) and (i < 15):
+                    if i != 0:
+                        searching_down_date_localized = date_localized - timedelta(minutes=(5 * i))
+                        try:
+                            searching_down_date_str = searching_down_date_localized.strftime('%Y-%m-%d %H:%M:%S')
+                            cursorDate = conn.cursor()
+                            cursorDate.execute(
+                                'SELECT DISTINCT ON (date) * FROM matches WHERE date = \'' + searching_down_date_str + '\'')
+                            existing_match = cursorDate.fetchall()
+                            date_existing_match = existing_match[0][3]
+                            team1_existing_match = existing_match[0][1]
+                            team2_existing_match = existing_match[0][2]
+                            match_id_existing_match = existing_match[0][0]
+                            score_existing_match = existing_match[0][5]
+                            exist = True
+                        except:
+                            print('Match doesn\'t exist or has already a result')
+                    searching_up_date_localized = date_localized + timedelta(minutes=(5 * i))
+                    try:
+                        searching_up_date_str = searching_up_date_localized.strftime('%Y-%m-%d %H:%M:%S')
+                        cursorDate = conn.cursor()
+                        cursorDate.execute('SELECT DISTINCT ON (date) * FROM matches WHERE date = \'' + searching_up_date_str + '\'')
+                        existing_match = cursorDate.fetchall()
+                        date_existing_match = existing_match[0][3]
+                        team1_existing_match = existing_match[0][1]
+                        team2_existing_match = existing_match[0][2]
+                        match_id_existing_match = existing_match[0][0]
+                        score_existing_match = existing_match[0][5]
+                        exist = True
+                    except:
+                        print('Match doesn\'t exist or has already a result')
+                    i += 1
+                    print('date_existing_match : ')
+                    print(date_existing_match)
+                    print('searching_down_date_str : ')
+                    print(searching_down_date_str)
+                    print('searching_up_date_str : ')
+                    print(searching_up_date_str)
+                if searching_down_date_str is not None:
+                    date_str = searching_down_date_str
+                if searching_up_date_str is not None:
+                    date_str = searching_up_date_str
+                print('date_str : ' + date_str)
+                if ((date_existing_match == searching_down_date_localized) or (date_existing_match == searching_up_date_localized)):
                     if event.find_element(By.CLASS_NAME, 'event__participant--home') is not None:
                         tmp_team1 = event.find_element(By.CLASS_NAME, 'event__participant--home').text
                         team1 = to_teamtag(tmp_team1)
@@ -284,24 +322,23 @@ if scrapping_result_mode == '0':
                             print('1 if correct')
                             tmp = input('Date : ' + date_str + ' ' + team1 + '-' + team2 + ' ' + score + ' ')
                             if tmp == '1':
-                                cur.execute('UPDATE matches SET score = ' + score + ' WHERE id = ' + str(match_id_existing_match))
+                                cur.execute('UPDATE matches SET score = %s WHERE id = %s', (score, match_id_existing_match))
                                 conn.commit()
                                 print('Updated')
                             tmp = '0'
                         elif (team1tricode != team2_existing_match) and (team2tricode != team1_existing_match):
                             score_team1 = ''
                             score_team2 = ''
+                            score = ''
                             if event.find_element(By.CLASS_NAME, 'event__score--home') is not None:
                                 score_team1 = event.find_element(By.CLASS_NAME, 'event__score--home').text
                             if event.find_element(By.CLASS_NAME, 'event__score--away') is not None:
                                 score_team2 = event.find_element(By.CLASS_NAME, 'event__score--away').text
                             score = score_team1 + score_team2
-                            if (score == '1') or (score == 1):
-                                score = '10'
                             print('1 if correct')
                             tmp = input('Date : ' + date_str + ' ' + team1 + '-' + team2 + ' ' + score + ' ')
                             if tmp == '1':
-                                cur.execute('UPDATE matches SET score = ' + score + ' WHERE id = ' + str(match_id_existing_match))
+                                cur.execute('UPDATE matches SET score = %s WHERE id = %s', (score, match_id_existing_match))
                                 conn.commit()
                                 print('Updated')
                             tmp = '0'
@@ -379,26 +416,57 @@ elif scrapping_result_mode == '1':
                 date = to_date(monthday)
                 date_localized = utc.localize(date)
                 print(date_localized)
-                try:
-                    date_str = date_localized.strftime('%Y-%m-%d %H:%M:%S')
-                    cursorDate = conn.cursor()
-                    cursorDate.execute('SELECT DISTINCT ON (date) * FROM matches WHERE date = \'' + date_str + '\'')
-                    existing_match = cursorDate.fetchall()
-                    date_existing_match = existing_match[0][3]
-                    team1_existing_match = existing_match[0][1]
-                    #print(team1_existing_match)
-                    team2_existing_match = existing_match[0][2]
-                    #print(team2_existing_match)
-                    match_id_existing_match = existing_match[0][0]
-                    #print(match_id_existing_match)
-                    score_existing_match = existing_match[0][5]
-                    #print(score_existing_match)
-                    #print(date_existing_match)
-                    exist = True
-                except:
-                    print('Match doesn\'t exist or has already a result')
-                    date_existing_match = datetime.now()
-                if date_existing_match == date_localized:
+                date_existing_match = None
+                i = 0
+                searching_up_date_str = None
+                searching_down_date_str = None
+                searching_up_date_localized = None
+                searching_down_date_localized = None
+                while (date_existing_match is None) and (i < 15):
+                    if i != 0:
+                        searching_down_date_localized = date_localized - timedelta(minutes=(5 * i))
+                        try:
+                            searching_down_date_str = searching_down_date_localized.strftime('%Y-%m-%d %H:%M:%S')
+                            cursorDate = conn.cursor()
+                            cursorDate.execute(
+                                'SELECT DISTINCT ON (date) * FROM matches WHERE date = \'' + searching_down_date_str + '\'')
+                            existing_match = cursorDate.fetchall()
+                            date_existing_match = existing_match[0][3]
+                            team1_existing_match = existing_match[0][1]
+                            team2_existing_match = existing_match[0][2]
+                            match_id_existing_match = existing_match[0][0]
+                            score_existing_match = existing_match[0][5]
+                            exist = True
+                        except:
+                            print('Match doesn\'t exist or has already a result')
+                    searching_up_date_localized = date_localized + timedelta(minutes=(5 * i))
+                    try:
+                        searching_up_date_str = searching_up_date_localized.strftime('%Y-%m-%d %H:%M:%S')
+                        cursorDate = conn.cursor()
+                        cursorDate.execute(
+                            'SELECT DISTINCT ON (date) * FROM matches WHERE date = \'' + searching_up_date_str + '\'')
+                        existing_match = cursorDate.fetchall()
+                        date_existing_match = existing_match[0][3]
+                        team1_existing_match = existing_match[0][1]
+                        team2_existing_match = existing_match[0][2]
+                        match_id_existing_match = existing_match[0][0]
+                        score_existing_match = existing_match[0][5]
+                        exist = True
+                    except:
+                        print('Match doesn\'t exist or has already a result')
+                    i += 1
+                    print('date_existing_match : ')
+                    print(date_existing_match)
+                    print('searching_down_date_str : ')
+                    print(searching_down_date_str)
+                    print('searching_up_date_str : ')
+                    print(searching_up_date_str)
+                if searching_down_date_str is not None:
+                    date_str = searching_down_date_str
+                if searching_up_date_str is not None:
+                    date_str = searching_up_date_str
+                print('date_str : ' + date_str)
+                if ((date_existing_match == searching_down_date_localized) or (date_existing_match == searching_up_date_localized)):
                     if event.find_element(By.CLASS_NAME, 'event__participant--home') is not None:
                         tmp_team1 = event.find_element(By.CLASS_NAME, 'event__participant--home').text
                         team1 = to_teamtag(tmp_team1)
@@ -413,6 +481,7 @@ elif scrapping_result_mode == '1':
                         if (team1tricode != team1_existing_match) and (team2tricode != team2_existing_match):
                             score_team1 = ''
                             score_team2 = ''
+                            score = ''
                             if event.find_element(By.CLASS_NAME, 'event__score--home') is not None:
                                 score_team1 = event.find_element(By.CLASS_NAME, 'event__score--home').text
                             if event.find_element(By.CLASS_NAME, 'event__score--away') is not None:
@@ -421,28 +490,23 @@ elif scrapping_result_mode == '1':
                             print('1 if correct')
                             tmp = input('Date : ' + date_str + ' ' + team1 + '-' + team2 + ' ' + score + ' ')
                             if tmp == '1':
-                                cur.execute('UPDATE matches SET score = ' + score + ' WHERE id = ' + str(match_id_existing_match))
+                                cur.execute('UPDATE matches SET score = %s WHERE id = %s', (score, match_id_existing_match))
                                 conn.commit()
                                 print('Updated')
                             tmp = '0'
                         elif (team1tricode != team2_existing_match) and (team2tricode != team1_existing_match):
                             score_team1 = ''
                             score_team2 = ''
+                            score = ''
                             if event.find_element(By.CLASS_NAME, 'event__score--home') is not None:
                                 score_team1 = event.find_element(By.CLASS_NAME, 'event__score--home').text
                             if event.find_element(By.CLASS_NAME, 'event__score--away') is not None:
                                 score_team2 = event.find_element(By.CLASS_NAME, 'event__score--away').text
                             score = score_team1 + score_team2
-                            if (score == '1') or (score == 1):
-                                score = '10'
-                            elif (score == '20') or (score == 2):
-                                score = '20'
-                            elif (score == '3') or (score == '3'):
-                                score = '30'
                             print('1 if corerct')
                             tmp = input('Date : ' + date_str + ' ' + team1 + '-' + team2 + ' ' + score + ' ')
                             if tmp == '1':
-                                cur.execute('UPDATE matches SET score = ' + score + ' WHERE id = ' + str(match_id_existing_match))
+                                cur.execute('UPDATE matches SET score = %s WHERE id = %s', (score, match_id_existing_match))
                                 conn.commit()
                                 print('Updated')
                             tmp = '0'

@@ -1,6 +1,14 @@
 class Team {
-  const Team(this.name, this.logo);
+  Team(this.name, this.logo);
 
-  final String name;
+  String name;
   final String logo;
+
+  String properTricode() {
+    if (name.length == 2) {
+      return name += '  ';
+    } else {
+      return name;
+    }
+  }
 }

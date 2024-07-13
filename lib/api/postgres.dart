@@ -151,17 +151,31 @@ class PostgresApi {
   }
 
   static Future<void> addPrediction(int matchId, String score) async {
-    await execute('''
-        INSERT INTO predictions (match_id, user_id, result)
-        VALUES ($matchId, ${User.currentUser!.id}, '$score')
-        ''');
+    final result =
+        await execute('''SELECT date FROM matches WHERE id = $matchId''');
+    String tmpDate =
+        result.map((e) => e.toColumnMap()).toList()[0].values.toString();
+    DateTime date = DateTime.parse(tmpDate.substring(1, tmpDate.length - 2));
+    if (date.isAfter(DateTime.now())) {
+      await execute('''
+          INSERT INTO predictions (match_id, user_id, result)
+          VALUES ($matchId, ${User.currentUser!.id}, '$score')
+          ''');
+    }
   }
 
-  static Future<void> updatePrediction(int matchId, String result) async {
-    await execute('''
-        UPDATE predictions SET result = '$result'
+  static Future<void> updatePrediction(int matchId, String score) async {
+    final result =
+        await execute('''SELECT date FROM matches WHERE id = $matchId''');
+    String tmpDate =
+        result.map((e) => e.toColumnMap()).toList()[0].values.toString();
+    DateTime date = DateTime.parse(tmpDate.substring(1, tmpDate.length - 2));
+    if (date.isAfter(DateTime.now())) {
+      await execute('''
+        UPDATE predictions SET result = '$score'
         WHERE match_id = $matchId AND user_id = ${User.currentUser!.id}
         ''');
+    }
   }
 
   static Future<List<(Match, String)>> getUserPredictions() async {
@@ -205,7 +219,7 @@ class PostgresApi {
         FROM users u
         INNER JOIN predictions p on u.id = p.user_id
         INNER JOIN matches m on p.match_id = m.id
-        WHERE m.date > (SELECT start_date FROM current_split WHERE id=(SELECT MAX(id) FROM current_split));
+        WHERE m.date > (SELECT begindate FROM tournaments WHERE begindate = (SELECT MIN(begindate) FROM tournaments));
         ''');
 
     Map<User, int> ranking = {};
@@ -235,13 +249,13 @@ class PostgresApi {
   }
 
   static Future<List<MapEntry<User, int>>> getSpecificCurrentRanking(
-      String tournament) async {
+      String tournamentTricode) async {
     final result = await execute('''
         SELECT u.id, u.username, u.emoji, p.result, m.score, m.bo
         FROM users u
         INNER JOIN predictions p on u.id = p.user_id
         INNER JOIN matches m on p.match_id = m.id
-        WHERE m.tournament = '$tournament' AND m.date > (SELECT start_date FROM current_split WHERE id=(SELECT MAX(id) FROM current_split));
+        WHERE m.tournament = '$tournamentTricode' AND m.date > (SELECT begindate FROM tournaments WHERE tricode = '$tournamentTricode');
         ''');
 
     Map<User, int> ranking = {};
@@ -361,10 +375,23 @@ class PostgresApi {
     return result.map((e) => Prediction.fromPostgres(e.toColumnMap())).toList();
   }
 
-  static Future<String> getCurrentSplit() async {
+  static Future<String> getCurrentTournament() async {
     final result = await execute('''
-    SELECT description FROM current_split WHERE id=(SELECT MAX(id) FROM current_split)
+        SELECT description FROM tournaments WHERE begindate = (SELECT MIN(begindate) FROM tournaments) 
     ''');
     return result[0][0].toString();
+  }
+
+  static Future<List<Match>> getTeamPreviousMatches(String team) async {
+    final result = await execute('''
+        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.score, m.bo, tourn.tricode as tourn_tricode
+        FROM matches m
+        LEFT JOIN teams t1 on m.team1 = t1.id
+        LEFT JOIN teams t2 on m.team2 = t2.id
+        LEFT JOIN tournaments tourn on m.tournament = tourn.tricode
+        WHERE (t1.tricode = '$team' OR t2.tricode = '$team') AND m.date <= NOW()
+        ORDER BY m.date DESC;
+    ''');
+    return result.map((e) => Match.fromPostgres(e.toColumnMap())).toList();
   }
 }
