@@ -114,6 +114,8 @@ class _RankingPageState extends State<RankingPage> {
                 DropdownMenuItem<Tournaments>(
                     value: Tournaments.worlds, child: Text('Worlds          ')),
                 DropdownMenuItem<Tournaments>(
+                    value: Tournaments.eswc, child: Text('ESWC          ')),
+                DropdownMenuItem<Tournaments>(
                     value: Tournaments.lfl, child: Text('LFL          ')),
                 DropdownMenuItem<Tournaments>(
                     value: Tournaments.eum, child: Text('EUM          ')),
@@ -164,6 +166,14 @@ class _RankingPageState extends State<RankingPage> {
                         PostgresApi.getSpecificCurrentRanking('WORLDS');
                     _globalRanking =
                         PostgresApi.getSpecificGlobalRanking('WORLDS');
+                  });
+                } else if (tournament == Tournaments.eswc) {
+                  setState(() {
+                    _tournamentChosen = Tournaments.eswc;
+                    _currentRanking =
+                        PostgresApi.getSpecificCurrentRanking('ESWC');
+                    _globalRanking =
+                        PostgresApi.getSpecificGlobalRanking('ESWC');
                   });
                 } else if (tournament == Tournaments.lfl) {
                   setState(() {

@@ -11,6 +11,7 @@ class SideDrawer extends StatelessWidget {
     return Drawer(
       child: ListView(
         children: [
+          /*
           ListTile(
             leading: const Text(
               '🚧',
@@ -21,7 +22,7 @@ class SideDrawer extends StatelessWidget {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: ((context) => const HomePage(Tournaments.global))))
             },
-          ),
+          ),*/
           ListTile(
             leading:
                 Image.asset('assets/Planet_logo.png', height: 40, width: 40),
@@ -108,7 +109,7 @@ class SideDrawer extends StatelessWidget {
           ListTile(
             leading:
                 Image.asset('assets/Worlds_logo.png', height: 40, width: 40),
-            title: const Text('Prédictions - Global'),
+            title: const Text('Prédictions - Worlds'),
             onTap: () => {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: ((context) => const HomePage(Tournaments.worlds))))
@@ -122,6 +123,22 @@ class SideDrawer extends StatelessWidget {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: ((context) =>
                       const RankingPage(Tournaments.worlds))))
+            },
+          ),
+          ListTile(
+            leading: Image.asset('assets/ESWC_logo.png', height: 40, width: 40),
+            title: const Text('Prédictions - ESWC'),
+            onTap: () => {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: ((context) => const HomePage(Tournaments.eswc))))
+            },
+          ),
+          ListTile(
+            leading: Image.asset('assets/ESWC_logo.png', height: 40, width: 40),
+            title: const Text('Classement Prédictions - ESWC'),
+            onTap: () => {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: ((context) => const RankingPage(Tournaments.eswc))))
             },
           ),
           ListTile(

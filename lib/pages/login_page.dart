@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:pronolol/api/postgres.dart';
 import 'package:pronolol/modals/inscription_modal.dart';
+import 'package:pronolol/modals/verification_connection_modal.dart';
 import 'package:pronolol/models/user_model.dart';
 import 'package:pronolol/pages/home_page.dart';
 import 'package:pronolol/utils/tournaments.dart';
@@ -23,13 +24,6 @@ class _LoginPageState extends State<LoginPage> {
   FocusNode focusNode2 = FocusNode();
   FocusNode focusNode3 = FocusNode();
   FocusNode focusNode4 = FocusNode();
-
-  /*@override
-  void initState() {
-    super.initState();
-    FocusScope.of(context).requestFocus(focusNode1);
-    SystemChannels.textInput.invokeMethod("TextInput.show");
-  }*/
 
   String encryptPassword(String password) {
     final bytes = utf8.encode(password);
@@ -152,6 +146,12 @@ class _LoginPageState extends State<LoginPage> {
                                         _userExistance = value;
                                       }));
                               if (_userExistance) {
+                                await showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return VerificationConnectionModal(
+                                          encryptPassword(pinToString(pin)));
+                                    });
                                 await User.saveUserPin(
                                     encryptPassword(pinToString(pin)));
                                 if (context.mounted) {
@@ -192,6 +192,12 @@ class _LoginPageState extends State<LoginPage> {
                             _userExistance = value;
                           }));
                   if (_userExistance) {
+                    await showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return VerificationConnectionModal(
+                              encryptPassword(pinToString(pin)));
+                        });
                     await User.saveUserPin(encryptPassword(pinToString(pin)));
                     if (context.mounted) {
                       Navigator.of(context).pushReplacement(MaterialPageRoute(

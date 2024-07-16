@@ -32,6 +32,22 @@ class PostgresApi {
     return User.fromPostgres(result.first.toColumnMap());
   }
 
+  static Future<String?> getUserByName(String cpin) async {
+    final result =
+        await execute('SELECT username FROM users WHERE cpin = \'$cpin\';');
+    var elems = '';
+    for (var elem in result) {
+      elems += elem.toString();
+    }
+    return elems.substring(1, elems.length - 1);
+  }
+
+  static Future<User?> getUserByPinName(String cpin, String userName) async {
+    final result = await execute(
+        'SELECT * FROM users WHERE cpin = \'$cpin\' AND username = \'$userName\';');
+    return User.fromPostgres(result.first.toColumnMap());
+  }
+
   static Future<List<String>> getUsers() async {
     final result = await execute('SELECT username FROM users;');
     return result.map((e) {
@@ -61,12 +77,23 @@ class PostgresApi {
   }
 
   static Tournaments getTournamentsName(Object? e) {
-    for (var value in Tournaments.values) {
-      if (value.name == e.toString()) {
-        return (value);
-      }
+    if (e.toString() == 'LEC') {
+      return (Tournaments.lec);
+    } else if (e.toString() == 'LCK') {
+      return (Tournaments.lck);
+    } else if (e.toString() == 'LPL') {
+      return (Tournaments.lpl);
+    } else if (e.toString() == 'LFL') {
+      return (Tournaments.lfl);
+    } else if (e.toString() == 'Worlds') {
+      return (Tournaments.worlds);
+    } else if (e.toString() == 'ESWC') {
+      return (Tournaments.eswc);
+    } else if (e.toString() == 'EUM') {
+      return (Tournaments.eum);
+    } else {
+      return Tournaments.msi;
     }
-    return Tournaments.msi;
   }
 
   static Future<List<Champion>> getChampions() async {
@@ -110,7 +137,7 @@ class PostgresApi {
 
   static Future<List<Match>> getSpecificMatchesToCome(String tournament) async {
     final result = await execute('''
-        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, tourn.tricode, p.result
+        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, tourn.tricode as tourn_tricode, p.result
         FROM matches m
         LEFT JOIN teams t1 on m.team1 = t1.id
         LEFT JOIN teams t2 on m.team2 = t2.id
@@ -124,7 +151,7 @@ class PostgresApi {
 
   static Future<List<Match>> getPastMatches() async {
     final result = await execute('''
-        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, m.score, tourn.tricode, p.result
+        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, m.score, tourn.tricode as tourn_tricode, p.result
         FROM matches m
         LEFT JOIN teams t1 on m.team1 = t1.id
         LEFT JOIN teams t2 on m.team2 = t2.id
@@ -138,7 +165,7 @@ class PostgresApi {
 
   static Future<List<Match>> getSpecificPastMatches(String tournament) async {
     final result = await execute('''
-        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, m.score, tourn.tricode, p.result
+        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, m.score, tourn.tricode as tourn_tricode, p.result
         FROM matches m
         LEFT JOIN teams t1 on m.team1 = t1.id
         LEFT JOIN teams t2 on m.team2 = t2.id
@@ -384,13 +411,13 @@ class PostgresApi {
 
   static Future<List<Match>> getTeamPreviousMatches(String team) async {
     final result = await execute('''
-        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.score, m.bo, tourn.tricode as tourn_tricode
+        SELECT m.id, t1.tricode as t1_code, t1.logo_url as t1_url, t2.tricode as t2_code, t2.logo_url as t2_url, m.date, m.bo, m.score, tourn.tricode as tourn_tricode
         FROM matches m
         LEFT JOIN teams t1 on m.team1 = t1.id
         LEFT JOIN teams t2 on m.team2 = t2.id
         LEFT JOIN tournaments tourn on m.tournament = tourn.tricode
         WHERE (t1.tricode = '$team' OR t2.tricode = '$team') AND m.date <= NOW()
-        ORDER BY m.date DESC;
+        ORDER BY m.date DESC
     ''');
     return result.map((e) => Match.fromPostgres(e.toColumnMap())).toList();
   }

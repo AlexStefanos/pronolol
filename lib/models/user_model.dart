@@ -35,6 +35,18 @@ class User {
     await instance.setString('id', id);
   }
 
+  static Future<void> saveUserPinName(String cpin, String userName) async {
+    User.currentUser = await PostgresApi.getUserByPinName(cpin, userName);
+    String id = User.currentUser!.id.toString();
+    SharedPreferences instance = await SharedPreferences.getInstance();
+    await instance.setString('id', id);
+  }
+
+  static Future<String?> getUserName(String cpin) async {
+    String? userName = await PostgresApi.getUserByName(cpin);
+    return userName;
+  }
+
   @override
   String toString() {
     return 'User{id: $id, name: $name, emoji: $emoji}';

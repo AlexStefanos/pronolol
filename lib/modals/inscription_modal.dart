@@ -48,7 +48,7 @@ class _InscriptionModalState extends State<InscriptionModal> {
                   controller: _titleController,
                   decoration: const InputDecoration(
                       border: OutlineInputBorder(),
-                      hintText: 'Choisis un Nom pour ton profil',
+                      hintText: 'Veuillez l\'écrire ici',
                       label: Text('Choisis un Nom pour ton profil')),
                   onSubmitted: _changeUserName),
               const SizedBox(height: 10),
@@ -64,7 +64,7 @@ class _InscriptionModalState extends State<InscriptionModal> {
                     _updateUser();
                     await PostgresApi.createUser(
                         widget.cpin, userName, userEmoji);
-                    await User.saveUserPin(widget.cpin);
+                    await User.saveUserPinName(widget.cpin, userName);
                     if (context.mounted) {
                       Navigator.of(context).pushReplacement(MaterialPageRoute(
                           builder: (context) =>

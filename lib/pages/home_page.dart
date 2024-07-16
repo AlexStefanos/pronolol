@@ -19,7 +19,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  var _currentSplit = '';
   var _tournamentChosen = Tournaments.global;
   var _matchesToCome = PostgresApi.getMatchesToCome();
   var _pastMatches = PostgresApi.getPastMatches();
@@ -34,11 +33,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     _tournamentChosen = Tournaments.global;
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      await PostgresApi.getCurrentTournament().then((value) => setState(() {
-            _currentSplit = value;
-          }));
-    });
     if (widget.tournament == Tournaments.global) {
       setState(() {
         _tournamentChosen = Tournaments.global;
@@ -74,6 +68,12 @@ class _HomePageState extends State<HomePage> {
         _tournamentChosen = Tournaments.worlds;
         _matchesToCome = PostgresApi.getSpecificMatchesToCome('WORLDS');
         _pastMatches = PostgresApi.getSpecificPastMatches('WORLDS');
+      });
+    } else if (widget.tournament == Tournaments.eswc) {
+      setState(() {
+        _tournamentChosen = Tournaments.eswc;
+        _matchesToCome = PostgresApi.getSpecificMatchesToCome('ESWC');
+        _pastMatches = PostgresApi.getSpecificPastMatches('ESWC');
       });
     } else if (widget.tournament == Tournaments.lfl) {
       setState(() {
@@ -122,6 +122,8 @@ class _HomePageState extends State<HomePage> {
                 DropdownMenuItem<Tournaments>(
                     value: Tournaments.worlds, child: Text('Worlds          ')),
                 DropdownMenuItem<Tournaments>(
+                    value: Tournaments.eswc, child: Text('ESWC          ')),
+                DropdownMenuItem<Tournaments>(
                     value: Tournaments.lfl, child: Text('LFL          ')),
                 DropdownMenuItem<Tournaments>(
                     value: Tournaments.eum, child: Text('EUM          ')),
@@ -167,6 +169,13 @@ class _HomePageState extends State<HomePage> {
                     _matchesToCome =
                         PostgresApi.getSpecificMatchesToCome('WORLDS');
                     _pastMatches = PostgresApi.getSpecificPastMatches('WORLDS');
+                  });
+                } else if (tournament == Tournaments.eswc) {
+                  setState(() {
+                    _tournamentChosen = Tournaments.eswc;
+                    _matchesToCome =
+                        PostgresApi.getSpecificMatchesToCome('ESWC');
+                    _pastMatches = PostgresApi.getSpecificPastMatches('ESWC');
                   });
                 } else if (tournament == Tournaments.lfl) {
                   setState(() {
@@ -225,11 +234,9 @@ class _HomePageState extends State<HomePage> {
                                           fontWeight: FontWeight.bold),
                                     ),
                                   ),
-                                  MatchItem(snapshot.data![i], 'à Venir',
-                                      _currentSplit)
+                                  MatchItem(snapshot.data![i], 'à Venir')
                                 ])
-                          : MatchItem(
-                              snapshot.data![i], 'à Venir', _currentSplit));
+                          : MatchItem(snapshot.data![i], 'à Venir'));
                 } else {
                   return const Center(child: CircularProgressIndicator());
                 }
@@ -268,6 +275,11 @@ class _HomePageState extends State<HomePage> {
                       _matchesToCome =
                           PostgresApi.getSpecificMatchesToCome('WORLDS');
                     });
+                  } else if (_tournamentChosen == Tournaments.eswc) {
+                    setState(() {
+                      _matchesToCome =
+                          PostgresApi.getSpecificMatchesToCome('ESWC');
+                    });
                   } else if (_tournamentChosen == Tournaments.lfl) {
                     setState(() {
                       _matchesToCome =
@@ -289,12 +301,26 @@ class _HomePageState extends State<HomePage> {
                 if (snapshot.connectionState == ConnectionState.done &&
                     snapshot.hasData) {
                   return ListView.builder(
-                    itemCount: (snapshot.data!.length >= 59)
-                        ? 59
-                        : snapshot.data!.length,
-                    itemBuilder: (ctx, i) =>
-                        MatchItem(snapshot.data![i], 'passés', _currentSplit),
-                  );
+                      itemCount: (snapshot.data!.length >= 59)
+                          ? 59
+                          : snapshot.data!.length,
+                      itemBuilder: (ctx, i) => i == 0 ||
+                              snapshot.data?[i].date.day !=
+                                  snapshot.data?[i - 1].date.day
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                  Center(
+                                    child: Text(
+                                      snapshot.data![i].literatureDate,
+                                      style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  MatchItem(snapshot.data![i], 'passés')
+                                ])
+                          : MatchItem(snapshot.data![i], 'passés'));
                 } else {
                   return const Center(child: CircularProgressIndicator());
                 }
@@ -328,6 +354,10 @@ class _HomePageState extends State<HomePage> {
                     setState(() {
                       _pastMatches =
                           PostgresApi.getSpecificPastMatches('WORLDS');
+                    });
+                  } else if (_tournamentChosen == Tournaments.eswc) {
+                    setState(() {
+                      _pastMatches = PostgresApi.getSpecificPastMatches('ESWC');
                     });
                   } else if (_tournamentChosen == Tournaments.lfl) {
                     setState(() {

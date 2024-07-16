@@ -8,9 +8,9 @@ import 'package:pronolol/utils/colors.dart';
 
 class MatchItem extends StatefulWidget {
   final Match match;
-  final String pageKey, currentSplit;
+  final String pageKey;
 
-  const MatchItem(this.match, this.pageKey, this.currentSplit, {super.key});
+  const MatchItem(this.match, this.pageKey, {super.key});
 
   @override
   State<MatchItem> createState() => _MatchItemState();
@@ -81,20 +81,11 @@ class _MatchItemState extends State<MatchItem> {
               children: [
                 if (widget.match.isFutureMatch) ...[
                   const SizedBox(width: 15, height: 40),
-                  if ((widget.match.tournament.nameDisplay() != 'MSI') ||
-                      (widget.match.tournament.nameDisplay() != 'Worlds')) ...[
-                    Text(
-                      '${widget.match.tournament.nameDisplay()}, ${widget.match.numericalDate}, BO : ${widget.match.bo}, ${widget.match.numericalSchedule}',
-                      style: const TextStyle(
-                          fontSize: 17, fontStyle: FontStyle.italic),
-                    ),
-                  ] else ...[
-                    Text(
-                      '${widget.currentSplit}, BO : ${widget.match.bo}, ${widget.match.numericalSchedule}',
-                      style: const TextStyle(
-                          fontSize: 17, fontStyle: FontStyle.italic),
-                    ),
-                  ],
+                  Text(
+                    '${widget.match.tournament.nameDisplay()}, ${widget.match.numericalDate}, BO : ${widget.match.bo}',
+                    style: const TextStyle(
+                        fontSize: 17, fontStyle: FontStyle.italic),
+                  ),
                   const Expanded(child: SizedBox(width: 1)),
                   IconButton(
                     onPressed: () {
@@ -104,21 +95,12 @@ class _MatchItemState extends State<MatchItem> {
                     iconSize: 30.0,
                   )
                 ] else ...[
-                  if ((widget.match.tournament.nameDisplay() != 'MSI') ||
-                      (widget.match.tournament.nameDisplay() != 'Worlds')) ...[
-                    const SizedBox(width: 15, height: 40),
-                    Text(
-                      '${widget.currentSplit}, ${widget.match.numericalDate}, ${widget.match.numericalSchedule}',
-                      style: const TextStyle(
-                          fontSize: 17, fontStyle: FontStyle.italic),
-                    ),
-                  ] else ...[
-                    Text(
-                      '${widget.match.tournament.nameDisplay()}, ${widget.match.numericalDate}, ${widget.match.numericalSchedule}',
-                      style: const TextStyle(
-                          fontSize: 17, fontStyle: FontStyle.italic),
-                    ),
-                  ],
+                  const SizedBox(width: 15, height: 40),
+                  Text(
+                    '${widget.match.tournament.nameDisplay()}, ${widget.match.numericalDate}',
+                    style: const TextStyle(
+                        fontSize: 17, fontStyle: FontStyle.italic),
+                  ),
                 ],
               ],
             ),
@@ -146,7 +128,7 @@ class _MatchItemState extends State<MatchItem> {
                     ),
                   ),
                   Text(
-                    widget.match.team1.properTricode().padLeft(3),
+                    widget.match.team1.cleanTricode().padLeft(3),
                     style: const TextStyle(
                       fontSize: 20,
                     ),
@@ -191,7 +173,7 @@ class _MatchItemState extends State<MatchItem> {
                     )
                   ],
                   Text(
-                    widget.match.team2.properTricode().padRight(3),
+                    widget.match.team2.cleanTricode().padRight(3),
                     style: const TextStyle(
                       fontSize: 20,
                     ),

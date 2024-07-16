@@ -4,11 +4,12 @@ class Team {
   String name;
   final String logo;
 
-  String properTricode() {
-    if (name.length == 2) {
-      return name += '  ';
+  String cleanTricode() {
+    String result = name;
+    if (result.length == 2) {
+      return result += '  ';
     } else {
-      return name;
+      return result;
     }
   }
 }

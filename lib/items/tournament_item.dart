@@ -32,6 +32,9 @@ class TournamentItem extends StatelessWidget {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: ((context) =>
                         const HomePage(Tournaments.worlds))));
+              } else if (name == 'ESWC') {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: ((context) => const HomePage(Tournaments.eswc))));
               } else if (name == 'LFL') {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: ((context) => const HomePage(Tournaments.lfl))));

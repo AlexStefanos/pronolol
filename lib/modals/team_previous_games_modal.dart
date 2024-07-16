@@ -16,85 +16,101 @@ class _TeamPreviousGamesModalState extends State<TeamPreviousGamesModal> {
   Widget build(BuildContext context) {
     return Center(
       child: Card(
-          child: FutureBuilder(
-              builder: (ctx, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.hasData) {
-                  return ListView.builder(
-                    itemCount: snapshot.data?.length,
-                    itemBuilder: (ctx, i) => Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Center(
-                            child: Row(
-                          children: [
-                            const Expanded(
-                              child: SizedBox(
-                                width: 1,
+          child: Column(
+        children: [
+          Row(
+            children: [
+              const Expanded(child: SizedBox(width: 1)),
+              IconButton(
+                onPressed: Navigator.of(context).pop,
+                icon: const Icon(Icons.close),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: FutureBuilder(
+                builder: (ctx, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasData) {
+                    return ListView.builder(
+                      itemCount: snapshot.data?.length,
+                      itemBuilder: (ctx, i) => Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Center(
+                              child: Row(
+                            children: [
+                              const Expanded(
+                                child: SizedBox(
+                                  width: 1,
+                                ),
                               ),
-                            ),
-                            Text(
-                              '${snapshot.data![i].numericalDate}: ',
-                            ),
-                            const Expanded(
-                              child: SizedBox(
-                                width: 1,
+                              Text(
+                                '${snapshot.data![i].numericalDate}: ',
                               ),
-                            ),
-                            Image.network(
-                              snapshot.data![i].team1.logo,
-                              width: 25,
-                              alignment: Alignment.center,
-                            ),
-                            const Expanded(
-                              child: SizedBox(
-                                width: 1,
+                              const Expanded(
+                                child: SizedBox(
+                                  width: 1,
+                                ),
                               ),
-                            ),
-                            Text(
-                              snapshot.data![i].team1.properTricode(),
-                            ),
-                            const Expanded(
-                              child: SizedBox(
-                                width: 1,
+                              Image.network(
+                                snapshot.data![i].team1.logo,
+                                width: 25,
+                                alignment: Alignment.center,
                               ),
-                            ),
-                            Text(
-                              ' ${snapshot.data![i].score}  ',
-                            ),
-                            const Expanded(
-                              child: SizedBox(
-                                width: 1,
+                              const Expanded(
+                                child: SizedBox(
+                                  width: 1,
+                                ),
                               ),
-                            ),
-                            Text(
-                              snapshot.data![i].team2.properTricode(),
-                            ),
-                            const Expanded(
-                              child: SizedBox(
-                                width: 1,
+                              Text(
+                                snapshot.data![i].team1.cleanTricode(),
                               ),
-                            ),
-                            Image.network(
-                              snapshot.data![i].team2.logo,
-                              width: 25,
-                              alignment: Alignment.center,
-                            ),
-                            const Expanded(
-                              child: SizedBox(
-                                width: 1,
+                              const Expanded(
+                                child: SizedBox(
+                                  width: 1,
+                                ),
                               ),
-                            ),
-                          ],
-                        )),
-                      ],
-                    ),
-                  );
-                } else {
-                  return const Center(child: CircularProgressIndicator());
-                }
-              },
-              future: PostgresApi.getTeamPreviousMatches(widget.team.name))),
+                              Text(
+                                ' ${snapshot.data![i].score}  ',
+                              ),
+                              const Expanded(
+                                child: SizedBox(
+                                  width: 1,
+                                ),
+                              ),
+                              Text(
+                                snapshot.data![i].team2.cleanTricode(),
+                              ),
+                              const Expanded(
+                                child: SizedBox(
+                                  width: 1,
+                                ),
+                              ),
+                              Image.network(
+                                snapshot.data![i].team2.logo,
+                                width: 25,
+                                alignment: Alignment.center,
+                              ),
+                              const Expanded(
+                                child: SizedBox(
+                                  width: 1,
+                                ),
+                              ),
+                            ],
+                          )),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
+                future: PostgresApi.getTeamPreviousMatches(widget.team.name)),
+          ),
+        ],
+      )),
     );
   }
 }
