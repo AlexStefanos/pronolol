@@ -113,6 +113,8 @@ def to_teamtag(value):
         result = 'TL'
     elif value == 'FlyQuest eSports':
         result = 'FLY'
+    elif value == '100 Thieves':
+        result = '100'
 
     #elif value == '':
     #    result = 'R7'
@@ -125,13 +127,21 @@ def to_teamtag(value):
     elif value == 'DetonatioN FocusMe':
         result = 'DFM'
 
-    #elif value == '':
-    #    result = 'PSG'
+    elif value == 'PSG Talon':
+        result = 'PSG'
     #elif value == '':
     #    result = 'CFO'
 
-    #elif value == '':
-    #    result = 'GAM'
+    elif value == 'GAM Esports':
+        result = 'GAM'
+    elif value == 'Vikings Esports':
+        result = 'VKE'
+    elif value == 'paiN Gaming':
+        result = 'PNG'
+    elif value == 'Fukuoka SoftBank Hawks':
+        result = 'FUK'
+    elif value == 'Movistar R7':
+        result = 'R7'
     #elif value == '':
     #    result = 'TW'
 
@@ -318,124 +328,131 @@ if scrapping_result_mode == '0':
                         conn.commit()
                         print('Inserted')
 elif scrapping_result_mode == '1':
-    leagues = ['LEC', 'LCK', 'LPL', 'LFL'] #+EUM, WORLDS, MSI
+    leagues = ['LEC', 'LCK', 'LPL', 'LFL', 'EUM'    ] #+EUM, WORLDS, MSI
     for league in leagues:
         print(league)
+        events = None
         if league == 'LEC':
-            driver = webdriver.Chrome(options=options)
-            driver.get('https://www.flashscore.fr/esports/league-of-legends/lec/calendrier/')
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
-            event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
-            events = event.find_elements(By.CLASS_NAME, 'event__match')
-
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
-            event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
-            events = event.find_elements(By.CLASS_NAME, 'event__match')
-            bo = input('BO1? BO3? BO5? Enter 1, 3 or 5 : ')
+            try:
+                driver = webdriver.Chrome(options=options)
+                driver.get('https://www.flashscore.fr/esports/league-of-legends/lec/calendrier/')
+                WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
+                event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
+                events = event.find_elements(By.CLASS_NAME, 'event__match')
+                bo = input('BO1? BO3? BO5? Enter 1, 3 or 5 : ')
+            except:
+                print('No matches in ' + league)
         elif league == 'LCK':
-            driver = webdriver.Chrome(options=options)
-            driver.get('https://www.flashscore.fr/esports/league-of-legends/lck/calendrier/')
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
-            event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
-            events = event.find_elements(By.CLASS_NAME, 'event__match')
-
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
-            event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
-            events = event.find_elements(By.CLASS_NAME, 'event__match')
-            bo = input('BO1? BO3? BO5? Enter 1, 3 or 5 : ')
+            try:
+                driver = webdriver.Chrome(options=options)
+                driver.get('https://www.flashscore.fr/esports/league-of-legends/lck/calendrier/')
+                WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
+                event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
+                events = event.find_elements(By.CLASS_NAME, 'event__match')
+                bo = input('BO1? BO3? BO5? Enter 1, 3 or 5 : ')
+            except:
+                print('No matches in ' + league)
         elif league == 'LPL':
-            driver = webdriver.Chrome(options=options)
-            driver.get('https://www.flashscore.fr/esports/league-of-legends/lpl/calendrier/')
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
-            event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
-            events = event.find_elements(By.CLASS_NAME, 'event__match')
-
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
-            event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
-            events = event.find_elements(By.CLASS_NAME, 'event__match')
-            bo = input('BO1? BO3? BO5? Enter 1, 3 or 5 : ')
+            try:
+                driver = webdriver.Chrome(options=options)
+                driver.get('https://www.flashscore.fr/esports/league-of-legends/lpl/calendrier/')
+                WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
+                event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
+                events = event.find_elements(By.CLASS_NAME, 'event__match')
+                bo = input('BO1? BO3? BO5? Enter 1, 3 or 5 : ')
+            except:
+                print('No matches in ' + league)
         elif league == 'WORLDS':
-            driver = webdriver.Chrome(options=options)
-            driver.get('https://www.flashscore.fr/esports/league-of-legends/world-championship/calendrier/')
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
-            event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
-            events = event.find_elements(By.CLASS_NAME, 'event__match')
-
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
-            event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
-            events = event.find_elements(By.CLASS_NAME, 'event__match')
-            bo = input('BO1? BO3? BO5? Enter 1, 3 or 5 : ')
+            try:
+                driver = webdriver.Chrome(options=options)
+                driver.get('https://www.flashscore.fr/esports/league-of-legends/world-championship/calendrier/')
+                WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
+                event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
+                events = event.find_elements(By.CLASS_NAME, 'event__match')
+                bo = input('BO1? BO3? BO5? Enter 1, 3 or 5 : ')
+            except:
+                print('No matches in ' + league)
         elif league == 'MSI':
-            driver = webdriver.Chrome(options=options)
-            driver.get('https://www.flashscore.fr/esports/league-of-legends/mid-season-invitational/calendrier/')
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
-            event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
-            events = event.find_elements(By.CLASS_NAME, 'event__match')
-
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
-            event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
-            events = event.find_elements(By.CLASS_NAME, 'event__match')
-            bo = input('BO1? BO3? BO5? Enter 1, 3 or 5 : ')
+            try:
+                driver = webdriver.Chrome(options=options)
+                driver.get('https://www.flashscore.fr/esports/league-of-legends/mid-season-invitational/calendrier/')
+                WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
+                event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
+                events = event.find_elements(By.CLASS_NAME, 'event__match')
+                bo = input('BO1? BO3? BO5? Enter 1, 3 or 5 : ')
+            except:
+                print('No matches in ' + league)
         elif league == 'LFL':
-            options = webdriver.ChromeOptions()
-            options.add_argument('--headless')
-            options.add_experimental_option('excludeSwitches', ['-enable-logging'])
-            driver = webdriver.Chrome(options=options)
-            driver.get('https://www.flashscore.fr/esports/league-of-legends/lfl/calendrier/')
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
-            event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
-            events = event.find_elements(By.CLASS_NAME, 'event__match')
-
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
-            event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
-            events = event.find_elements(By.CLASS_NAME, 'event__match')
-            bo = input('BO1? BO3? BO5? Enter 1, 3 or 5 : ')
+            try:
+                driver = webdriver.Chrome(options=options)
+                driver.get('https://www.flashscore.fr/esports/league-of-legends/lfl/calendrier/')
+                WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
+                event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
+                events = event.find_elements(By.CLASS_NAME, 'event__match')
+                bo = input('BO1? BO3? BO5? Enter 1, 3 or 5 : ')
+            except:
+                print('No matches in ' + league)
         elif league == 'EUM':
-            driver = webdriver.Chrome(options=options)
-            driver.get('https://www.flashscore.fr/esports/league-of-legends/emea-masters/calendrier/')
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
-            event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
-            events = event.find_elements(By.CLASS_NAME, 'event__match')
-
-            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
-            event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
-            events = event.find_elements(By.CLASS_NAME, 'event__match')
-            bo = input('BO1? BO3? BO5? Enter 1, 3 or 5 : ')
-        for event in events:
-            cur = conn.cursor()
-            team1 = ''
-            team2 = ''
-            exist = False
-            if event.find_element(By.CLASS_NAME, 'event__time') is not None:
-                monthday = event.find_element(By.CLASS_NAME, 'event__time').text
-                date = to_date(monthday)
-                date_localized = utc.localize(date)
-                print(date_localized)
-                try:
-                    date_str = date_localized.strftime('%Y-%m-%d %H:%M:%S')
-                    cursorDate = conn.cursor()
-                    cursorDate.execute('SELECT DISTINCT ON (date) * FROM matches WHERE date = \'' + date_str + '\'')
-                    existing_match = cursorDate.fetchall()
-                    date_existing_match = existing_match[0][3]
-                    team1_existing_match = existing_match[0][1]
-                    team2_existing_match = existing_match[0][2]
-                    exist = True
-                except:
-                    print('Match doesn\'t exist or has already a result')
-                    date_existing_match = datetime.now()
-                if date_existing_match != date_localized:
-                    if event.find_element(By.CLASS_NAME, 'event__participant--home') is not None:
-                        tmp_team1 = event.find_element(By.CLASS_NAME, 'event__participant--home').text
-                        team1 = to_teamtag(tmp_team1)
+            try:
+                driver = webdriver.Chrome(options=options)
+                driver.get('https://www.flashscore.fr/esports/league-of-legends/emea-masters/calendrier/')
+                WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
+                event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
+                events = event.find_elements(By.CLASS_NAME, 'event__match')
+                bo = input('BO1? BO3? BO5? Enter 1, 3 or 5 : ')
+            except:
+                print('No matches in ' + league)
+        if events is not None:
+            for event in events:
+                cur = conn.cursor()
+                team1 = ''
+                team2 = ''
+                exist = False
+                if event.find_element(By.CLASS_NAME, 'event__time') is not None:
+                    monthday = event.find_element(By.CLASS_NAME, 'event__time').text
+                    date = to_date(monthday)
+                    date_localized = utc.localize(date)
+                    print(date_localized)
+                    try:
+                        date_str = date_localized.strftime('%Y-%m-%d %H:%M:%S')
+                        cursorDate = conn.cursor()
+                        cursorDate.execute('SELECT DISTINCT ON (date) * FROM matches WHERE date = \'' + date_str + '\'')
+                        existing_match = cursorDate.fetchall()
+                        date_existing_match = existing_match[0][3]
+                        team1_existing_match = existing_match[0][1]
+                        team2_existing_match = existing_match[0][2]
+                        exist = True
+                    except:
+                        print('Match doesn\'t exist or has already a result')
+                        date_existing_match = datetime.now()
+                    if date_existing_match != date_localized:
+                        if event.find_element(By.CLASS_NAME, 'event__participant--home') is not None:
+                            tmp_team1 = event.find_element(By.CLASS_NAME, 'event__participant--home').text
+                            team1 = to_teamtag(tmp_team1)
+                            if exist:
+                                team1tricode = get_team_tricode(team1)
+                        if event.find_element(By.CLASS_NAME, 'event__participant--away') is not None:
+                            tmp_team2 = event.find_element(By.CLASS_NAME, 'event__participant--away').text
+                            team2 = to_teamtag(tmp_team2)
+                            if exist:
+                                team2tricode = get_team_tricode(team2)
                         if exist:
-                            team1tricode = get_team_tricode(team1)
-                    if event.find_element(By.CLASS_NAME, 'event__participant--away') is not None:
-                        tmp_team2 = event.find_element(By.CLASS_NAME, 'event__participant--away').text
-                        team2 = to_teamtag(tmp_team2)
-                        if exist:
-                            team2tricode = get_team_tricode(team2)
-                    if exist:
-                        if (team1tricode != team1_existing_match) and (team2tricode != team2_existing_match):
+                            if (team1tricode != team1_existing_match) and (team2tricode != team2_existing_match):
+                                score_team1 = ''
+                                score_team2 = ''
+                                if event.find_element(By.CLASS_NAME, 'event__score--home') is not None:
+                                    score_team1 = event.find_element(By.CLASS_NAME, 'event__score--home').text
+                                if event.find_element(By.CLASS_NAME, 'event__score--away') is not None:
+                                    score_team2 = event.find_element(By.CLASS_NAME, 'event__score--away').text
+                                score = None
+                                if (score_team1 != '-') and (score_team2 != '-'):
+                                    score = score_team1 + score_team2
+                                cur.execute(
+                                    'INSERT INTO matches (id, date, team1, score, team2, bo, tournament) VALUES ((select max(id) from matches) + 1, %s, (SELECT id FROM teams t WHERE t.tricode = %s), %s, (SELECT id FROM teams t WHERE t.tricode = %s), %s, %s)',
+                                    (date_localized, team1, score, team2, bo, league))
+                                conn.commit()
+                                print('Inserted')
+                        else:
                             score_team1 = ''
                             score_team2 = ''
                             if event.find_element(By.CLASS_NAME, 'event__score--home') is not None:
@@ -450,19 +467,4 @@ elif scrapping_result_mode == '1':
                                 (date_localized, team1, score, team2, bo, league))
                             conn.commit()
                             print('Inserted')
-                    else:
-                        score_team1 = ''
-                        score_team2 = ''
-                        if event.find_element(By.CLASS_NAME, 'event__score--home') is not None:
-                            score_team1 = event.find_element(By.CLASS_NAME, 'event__score--home').text
-                        if event.find_element(By.CLASS_NAME, 'event__score--away') is not None:
-                            score_team2 = event.find_element(By.CLASS_NAME, 'event__score--away').text
-                        score = None
-                        if (score_team1 != '-') and (score_team2 != '-'):
-                            score = score_team1 + score_team2
-                        cur.execute(
-                            'INSERT INTO matches (id, date, team1, score, team2, bo, tournament) VALUES ((select max(id) from matches) + 1, %s, (SELECT id FROM teams t WHERE t.tricode = %s), %s, (SELECT id FROM teams t WHERE t.tricode = %s), %s, %s)',
-                            (date_localized, team1, score, team2, bo, league))
-                        conn.commit()
-                        print('Inserted')
 driver.quit()

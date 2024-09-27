@@ -207,6 +207,16 @@ if scrapping_result_mode == '0':
             WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
             event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
             events = event.find_elements(By.CLASS_NAME, 'event__match')
+        elif choose_league == 'WORLDS':
+            driver = webdriver.Chrome(options=options)
+            driver.get('https://www.flashscore.fr/esports/league-of-legends/world-championship/resultats/')
+            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
+            event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
+            events = event.find_elements(By.CLASS_NAME, 'event__match')
+
+            WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.leagues--static')))
+            event = driver.find_element(By.CSS_SELECTOR, '.leagues--static')
+            events = event.find_elements(By.CLASS_NAME, 'event__match')
         elif choose_league == 'MSI':
             driver = webdriver.Chrome(options=options)
             driver.get('https://www.flashscore.fr/esports/league-of-legends/mid-season-invitational/resultats/')
